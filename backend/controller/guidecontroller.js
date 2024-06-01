@@ -1,9 +1,9 @@
 const guidemodel = require('../model/guidemodel')
 const cloudinary = require('cloudinary').v2
-const sendMail = require('../email')
+const { sendOtp, verifyOtp } = require('../email')
 const { bcryptverify } = require('../assets/hashing')
 const { hashpassword } = require('../assets/hashing')
-const jwt = require('jsonwebtoken')
+const jwtTokenGenerator=require('../assets/jwtTokenGenerator')
 const { get } = require('../routes/userRoutes')
 const getAllGuides = async (req, res) => {
   try {
@@ -13,6 +13,16 @@ const getAllGuides = async (req, res) => {
   }
   catch (err) {
     console.log('err in getallguide from guide controller', err)
+    return res.status(500).send('oops server error')
+  }
+}
+const getGuideData = async (req, res) => {
+  try {
+    const users = await guidemodel.find({email:req.body.email}, { __v: 0, password: 0, photoid: 0 }).populate('tripId')
+    return res.status(200).json({ users: users })
+  }
+  catch (err) {
+    console.log('err in getguidedata from guide controller', err)
     return res.status(500).send('oops server error')
   }
 }
@@ -61,53 +71,71 @@ const guideRegistration = async (req, res) => {
 
   }
 }
-let otp = null
-const guideTokengenerator = async (req, res) => {// for generating jwt
-  const { otp: receivedOtp, email } = req.body
-  const nowTime = new Date().getSeconds()
-  const deviceId = req.headers.deviceid
-  if (!receivedOtp || !deviceId)
-    return res.status(400).json({ success: false, message: "insufficient  inputs" })
-  if (nowTime - time > 15)
-    return res.status(401).json({ success: false, message: "otp timeout" })
-  if (receivedOtp != otp)
-    return res.status(401).json({ success: false, message: "wrong otp" })
-  //now generate token with email and deviceid
-  jwt.sign({ deviceId, email }, 'secretkey', (err, token) => {
-    if (err)
-      return res.status(500).json({ success: false, message: "oops token generation failure" })
-    return res.status(200).cookie('AuthCookie', token, { maxAge: 1209600 }).json({ success: true, message: 'user authenticated' })
-  })
-  return//return from function
+const sendOtpFunction = async (req, res) => {
+  try {
+    const { email, userType } = req.body
+    if (!email || !userType)
+      return res.status(400).json({ message: "InSufficient Data Provided" })
+    const userExists = await guidemodel.findOne({ email: email })
+    if (!userExists)
+      return res.status(404).json({ message: "User Not Found" })
+    await sendOtp(email)
+    return res.status(200).json({ message: "Otp Sent SuccessFully" })
+  }
+  catch (err) {
+    console.log('err in sendotp function in guidecontroller', err)
+    return res.status(500).json({ message: "Server Error" })
+
+  }
 }
+
+const verifyOtpFunction = async (req,res) => {
+  try {
+    const { email, userType,otp,deviceId } = req.body
+    if (!email || !userType||!deviceId)
+      return res.status(400).json({ message: "InSufficient Data Provided" })
+    const userExists = await guidemodel.findOne({ email: email })
+    if (!userExists)
+      return res.status(404).json({ message: "User Not Found" })
+    await verifyOtp(req.body.otp)//if error or wrong otp control passes to catch block automatically
+    const {err,data}=await jwtTokenGenerator({email,userType,deviceId})
+    if(err)
+      return res.status(500).json({message:"Jwt Signing Error"})
+    return res.status(200).cookie('AuthCookie', data, { maxAge: 1814400000 }).json({ success: true, message: 'user authenticated' })
+  }
+  catch (err) {
+    console.log('err in verifyotp function in guidecontroller', err)
+    return res.status(500).json({ message: "Server Error" })
+
+  }
+}
+
 const guideLogin = async (req, res) => {
-  const { useremail, password } = req.body
-  if (!useremail || !password)
+  const { email, password } = req.body
+  if (!email || !password)
     return res.status(400).json({ success: false, message: "insufficient inputs provided" })
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;//email regex
-  if (!emailRegex.test(useremail) || password.length < 8)//data validation here
+  if (!emailRegex.test(email) || password.length < 8)//data validation here
     return res.status(400).json({ success: false, message: "invalid inputs" })
-  const isUserPresent = await guidemodel.findOne({ email: useremail })
+  const isUserPresent = await guidemodel.findOne({ email: email })
   if (!isUserPresent)
     return res.status(403).json({ success: false, message: "user not present" })
+  console.log('guide is', isUserPresent)
   const isPasswordCorrect = await bcryptverify(password, isUserPresent.password)
   console.log(isPasswordCorrect)
   if (!isPasswordCorrect)
     return res.status(401).json({ success: false, message: "invalid credientials" })
-  //send mail with otp for added security and identifying true user
-  const mailResponse = await sendMail(useremail)
-  time = new Date().getSeconds()
-  console.log(time)
-  console.log('male respoonse is', mailResponse)
-  otp = mailResponse
-  return res.status(200).json({ success: true, message: 'otp sent successfully' })
+  return res.status(200).json({ success: true, message: 'Login Successfull Go For Otp' })
 }
 module.exports = {
   guideRegistration,
-  guideLogin, guideTokengenerator,
-  getAllGuides
+  guideLogin,
+  getAllGuides,
+  sendOtpFunction,
+  verifyOtpFunction,
+  getGuideData
 }
-/* const mailResponse = await sendMail(useremail)
+/* const mailResponse = await sendMail(email)
     time = new Date().getSeconds()
     console.log(time)
     console.log('male respoonse is', mailResponse)

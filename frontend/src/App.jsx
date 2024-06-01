@@ -4,7 +4,8 @@ import Navbar from './components/navbar';
 import axios from 'axios';
 import generateFingerprint from './deviceFinder';
 import { useDispatch } from 'react-redux';
-import { addDeviceID, addAuthStatus, addUserName, addUserType, addUser } from './redux/userSlice';
+import { addTrip } from './redux/tripsSlice';
+import { addDeviceID, addAuthStatus, addUserType, addUser, addUserEmail } from './redux/userSlice';
 import TripInfo from './components/tripInfo';
 import Advertisement from './components/advertisement';
 import { addAdvertisement } from './redux/advertisementSlice';
@@ -30,10 +31,21 @@ const PaymentSuccess = lazy(() => import('./components/paymentSuccess'));
 const PaymentFailure = lazy(() => import('./components/paymentFailure'));
 const TripsAndTreks = lazy(() => import('./components/tripsAndTreks'));
 const Dashboard = lazy(() => import('./components/dashboard'));
-const AddToGallery= lazy(() => import('./components/addtogallery'));
+const AddToGallery = lazy(() => import('./components/addtogallery'));
+const AboutUs = lazy(() => import('./components/aboutus'));
 function App() {
 
   const dispatch = useDispatch();
+  const fetchTreks = async () => {
+    try {
+      const response = await axios.get('http://localhost:8000/api/trips/getalltrips')
+      dispatch(addTrip(response.data.trips))
+      console.log('tripdata fom backend is',response)
+    }
+    catch (err) {
+      console.log(err)
+    }
+  }
   const fetchAdvertisement = async () => {
     try {
       const response = await axios.get("http://localhost:8000/api/advertisement/getadvertisement")
@@ -45,6 +57,7 @@ function App() {
   }
   useEffect(() => {
     fetchAdvertisement()
+    fetchTreks()
     generateFingerprint().then(async (id) => {
       dispatch(addDeviceID(id));
       console.log('id generated from app.jsx', id);
@@ -54,7 +67,7 @@ function App() {
       if (response.request.status === 200) {
         console.log('auth response is', response.data);
         dispatch(addUserType(response.data.userType));
-        dispatch(addUserName(response.data.username));
+        dispatch(addUserEmail(response.data.user.email))
         dispatch(addAuthStatus(true));
         dispatch(addUser(response.data.user));
       }
@@ -68,13 +81,14 @@ function App() {
         <Routes>
           <Route exact path='/gallery' element={<Gallery />} />
           <Route exact path='/' element={<Home />} />
+          <Route exact path='/aboutus' element={<AboutUs />} />
           <Route exact path='/explore' element={<Explore />} />
           <Route exact path='/tripinfo/:id' element={<TripInfo />} />
           <Route exact path='/paymentsuccess' element={<PaymentSuccess />} />
           <Route exact path='/paymentfailure' element={<PaymentFailure />} />
           <Route exact path='/userregister' element={<UserRegister />} />
           <Route exact path='/userlogin' element={<LoginForm />} />
-          <Route exact path='/otpform/:email' element={<OtpForm />} />
+          <Route exact path='/otpform' element={<OtpForm />} />
           <Route element={<Protected />} >
             <Route exact path='/userpage' element={<UserPage />} />
             <Route exact path='/guidepage' element={<GuidePage />} />

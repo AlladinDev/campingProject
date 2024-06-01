@@ -50,7 +50,7 @@ export default function Navbar() {
               <Link to='/explore'>Explore</Link>
             </li>
             <li>
-              <Link to='/members'>Members</Link>
+              <Link to='/aboutus'>About Us</Link>
             </li>
             <li>
               <Link to='/Gallery'>Gallery</Link>
@@ -76,14 +76,16 @@ export default function Navbar() {
               <Link to='/explore'>Explore</Link>
             </li>
             <li className=' hover:bg-gray-400 p-3 px-6 rounded-full'>
-              <Link to='/members'>Members</Link>
+              <Link to='/aboutus'>About Us</Link>
             </li>
             <li className=' hover:bg-gray-400 p-3 px-6 rounded-full'>
               <Link to='/gallery'>Gallery</Link>
             </li>
+           
             <li className=' hover:bg-gray-400 p-3 px-6 rounded-full'>
               <Link to='/userregister'>Register</Link>
             </li>
+           
           </ul>
         </div>
       </nav>

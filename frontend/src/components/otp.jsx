@@ -1,116 +1,121 @@
-import React, { useState } from 'react';
-import { useEffect } from 'react';
 import axios from 'axios';
-import { useParams } from 'react-router-dom';
-import { useSelector } from 'react-redux';
-import { useDispatch } from 'react-redux';
-import { addAuthStatus ,addUser, addUserType} from '../redux/userSlice';
-const OtpForm = () => {
-    const [data, setData] = useState({ otp: '', email: ''})//otp
-    const [err, setError] = useState('')//otp invalid  error
-    const [apiError, setApiError] = useState('')//api error message
-    const [apiSuccess, setApiSuccess] = useState('')//api success message
-    const [isSubmitting, setSubmitting] = useState(false)//flag for submit button status
-    const [fingerprint, setFingerprint] = useState('')
-    const { email: userEmail } = useParams()
+import { React, useState, useEffect } from 'react'
+import { FaShieldAlt } from 'react-icons/fa';
+import { useLocation, useNavigate} from 'react-router-dom';
+import {useDispatch,useSelector} from 'react-redux'
+import { addUserType,addAuthStatus,addUserEmail } from '../redux/userSlice';
+function EmailOtpVerification() {
+    const location = useLocation()
     const dispatch = useDispatch()
-    const deviceid = useSelector((state) => state.user.deviceID)//get device id from redux store
-    const username=useSelector((state) => state.user.username)
-    const userType=useSelector((state) => state.user.userType)
-    const handleChange = (e) => {
-        setApiError('')//set api error message if any
-        setApiSuccess('')//reset api success message if any
-        setError('')
-        const { name, value } = e.target
-        setError('')//remove corresponding error msg 
-        setData({ ...data, [name]: value })
-    }
-
-    useEffect(() => {
-        setFingerprint(deviceid)//set device id in usestate variable fingerprint
-        setData({ ...data, email: userEmail,username,userType })
-    }, [deviceid])
-
-    const handleSubmit = async (event) => {
-        event.preventDefault();
-        //otp type validation
-        console.log('otp data is', data.otp)
-        const pattern = /^[0-9]+$/
-        const matchResult = pattern.test(data.otp)
-        console.log(matchResult)
-        if (matchResult)
-            console.log('otp matched successfully in otp from')
-        if (!matchResult)
-            return setError('invalid otp entered ')
-        //now api calls
-
-        setApiError('')//set api error message if any
-        setApiSuccess('')//reset api success message if any
+    const deviceId=useSelector((state)=>state.user.deviceID)
+    const { email, userType } = location.state
+    console.log(location)
+    const [otp, setOtp] = useState('')
+    const [otpErr, setOtpErr] = useState('')
+    const [otpMsg, setOtpMsg] = useState('')
+    const [otpSuccessMsg, setOtpSuccessMsg] = useState('')
+    const [isOtpSent, setOtpSent] = useState('')
+    const [buttonClicked, setButtonClicked] = useState(false)
+    const verifyOtp = async (e) => {
+        e.preventDefault()
         try {
-         console.log(userType)
-            data.userType=userType//set userType to data.userType
-            console.log('final data to be sent for backend is ',data)
-            setSubmitting(true)//set submit button status to true
-            const response = await axios.post(`http://localhost:8000/api/${userType}/tokengeneration`, data, {
-                headers: {
-                    deviceId: fingerprint//sent deviceuniqueid with post request
-                },
-                withCredentials: true
-            })
-            console.log('response is',response.data)
-            dispatch(addAuthStatus(true))//add auth status true to user
-            setApiSuccess(response.data.message)
-            setSubmitting(false)
-            setData({ otp: '' })
+            const response = await axios.post(`http://localhost:8000/api/${userType}/verifyotp`, { email, userType,otp,deviceId}, { withCredentials: true })
+            console.log(response.data)
+            setOtpSuccessMsg('User Autheticated')
+            setOtp('')
+            // since user is now authenticated so add his user type and authstatus to redux store
+            dispatch(addAuthStatus(true))
+            dispatch(addUserEmail(email))
+            dispatch(addUserType(userType))
         }
         catch (err) {
-            setData({ otp: '' })
-            setSubmitting(false)//set submit button status to false or reset it 
-            if (err.response.request.status == 500) {
-                setApiError("oops server error happened")
-                console.log(err)
+            console.log('err is', err)
+            if (err.response) {
+                setOtpErr(err.response.data.message)
                 return
-
             }
-            setApiError(err.response.data.message)
-            console.log('error from login page catch block', err)
-            return
+            else if (err.request) {
+                setOtpErr('Server Connection Failed')
+                return
+            }
         }
-        // Handle form submission here
+    }
+    const requestOtp = async () => {
+        try {
+            setOtpErr('')
+            setButtonClicked(true)
+            setOtpMsg('Requesting Otp')
+            const response = await axios.post(`http://localhost:8000/api/${userType}/sendotp`,{email:email,userType:userType})
+            console.log(`http://localhost:8000/${userType}/sendotp`)
+            console.log(response.data)
+            setButtonClicked(false)
+            setOtpMsg('')
+            setOtpSent(true)
+        }
+        catch (err) {
+            console.log('err is', err)
+            setButtonClicked(false)
+            setOtpSuccessMsg('')
+            setOtpMsg('')
+            if (err.response) {
+                setOtpErr(err.response.data.message)
+                return
+            }
+            else if (err.request) {
+                setOtpErr('Server Connection Failed')
+                return
+            }
+        }
+    }
+    const requestOtpAgain = () => {//if any error occurs in case of otp request otp again here
+        setOtp('')
+        requestOtp()
     }
 
-    return (
-        <div className="flex justify-center items-center min-h-[92vh] bg-gray-200">
-            <form onSubmit={handleSubmit} className="bg-white font-serif shadow-md shadow-black rounded px-9 pt-6 pb-8  mb-4">
-                <h3 className='mx-auto text-2xl text-black text-center my-2 '>Otp Validation Form</h3>
-                <h3 className='apiError text-red-600 text-center uppercase'>{apiError}</h3>
-                <h3 className='optError text-red-600 text-center uppercase'>{err}</h3>
-                <h3 className='apiSuccess text-green-600 text-center uppercase'>{apiSuccess}</h3>
-                <div className="mb-4">
-                    <label className="block text-gray-700 text-sm font-bold py-4 " htmlFor="otp">
-                        Enter Otp sent to registered email
-                    </label>
-                    <input className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="otp" type="tel" name='otp' value={data.otp} onChange={handleChange} required />
+    const handleChange = (e) => {
+        const { value } = e.target;//extract otp from form input tag
+        setOtpErr('')
+        setOtpMsg('')
+        setOtp(value)
+        setOtpSuccessMsg('')
 
-                    {err.otp && <div className='text-red-700 text-center '>Invalid Otp</div>}
+    }
+    console.log('err set', otpErr)
+
+    return (
+        <div className='w-full flex flex-col sm:flex-row gap-5 justify-center items-center px-4 min-h-[90vh]'>
+            <div className='w-full flex justify-center items-center sm:w-[50%] h-[70vh] sm:h-[90vh] '>
+                <img src="../../loginform.jpg" alt="" className='bg-cover bg-no-repeat' />
+            </div>
+            <div className='  w-full sm:w-[50%] h-[70vh] sm:h-[90vh] flex justify-center items-center'>
+                <div className='w-[23rem] aspect-auto bg-[#ffff] shadow-md'>
+                    <form onSubmit={verifyOtp} className=' h-full relative flex items-center flex-col'>
+                        <h4 className='text-2xl text-center mb-10 relative top-4 flex justify-center'><FaShieldAlt size={50} /></h4>
+                        <h4 className='text-2xl text-center mb-10 relative top-4'>OTP AUTHENTICATION</h4>
+                        <small className='text-center text-2xl text-black my-2'>{otpMsg}</small>
+                        <small className='text-center text-2xl text-green-600 my-2'>{otpSuccessMsg}</small>
+                        <small className='text-center text-2xl text-red-800 my-2'>{otpErr}</small>
+                        <div className='w-[98%] mx-auto  '>
+                            {isOtpSent ?
+                                <input type="tel" name='otp' placeholder='place enter otp here' required value={otp} onChange={handleChange} className='w-full p-4 rounded-full border border-black' /> : null
+                            }
+                            {
+                                otpErr ? null : <button type="submit" disabled={buttonClicked} className={`w-full rounded-md shadow-sm py-3 my-5 bg-[#1D4ED8] ${buttonClicked && ' text-gray-300'}`} onClick={isOtpSent ? verifyOtp : requestOtp}>
+                                    {isOtpSent ? "Submit" : "Request otp"}
+                                </button>
+                            }
+
+
+                            {//if otp error occurs show this button for resending otp
+                                otpErr && <button onClick={requestOtpAgain} className={`w-full rounded-md shadow-sm py-3 my-5 bg-[#1D4ED8] ${buttonClicked && ' text-gray-300'} `}>Request Again</button>
+                            }
+                        </div>
+
+                    </form>
                 </div>
-                <div>
-                    <input type='hidden' readOnly={true} className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="email" name='email' value={data.email} />
-                </div>
-                <div>
-                    <input type='hidden' readOnly={true} className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="username" name='username' value={data.username} />
-                </div>
-                <div>
-                    <input type='hidden' readOnly={true} className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="userType" name='userType' value={data.userType} />
-                </div>
-                <div className="flex items-center justify-between">
-                    <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="submit">
-                        {isSubmitting ? 'Submitting...' : "Sign In"}
-                    </button>
-                </div>
-            </form>
+            </div>
         </div>
-    );
+    )
 }
 
-export default OtpForm;
+export default EmailOtpVerification

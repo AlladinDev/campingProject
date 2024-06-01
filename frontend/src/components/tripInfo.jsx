@@ -10,7 +10,8 @@ import Weathercard from './weathercard';
 export default function TripInfo() {
     const { id: tripId } = useParams()
     const trip = useSelector((state) => state.tripStore.tripData);
-    const [weatherErr, setWeatherErr] = useState('');
+   
+   const [weatherErr, setWeatherErr] = useState('');
     const tripData = trip.filter((item) => item._id === tripId)[0];
     console.log('tridata is', tripData)
     const [weatherInfo, weatherApiErr] = useweatherdata(tripData.destination);
@@ -26,7 +27,7 @@ export default function TripInfo() {
     return (
         tripData && (
             <div className='min-h-[90vh] bg-[#FEFAF6]'>
-                <div className="imagediv border-2 border-red-800">
+                <div className="imagediv border-2  border-red-800">
                     <img src={tripData.photo} alt="" className='object-cover w-full' />
                 </div>
                 <h2 className='text-3xl text-center my-2'>{tripData.destination}</h2>
@@ -72,7 +73,7 @@ export default function TripInfo() {
                             </tbody>
                         </table>
                         <h2 className='p-2 py-2 my-2 rounded-md text-2xl bg-yellow-200'>
-                            Contact Guide <FontAwesomeIcon size='2x' icon={faPhone} className='ml-2 text-blue-600' />
+                            Contact Guide <a href={`tel:91${tripData.guideAllotted.mobile}`}><FontAwesomeIcon size='2x' icon={faPhone} className='ml-2 text-blue-600' /></a>
                         </h2>
                         <h2 className='p-2 py-2 w-full bg-blue-600 rounded-md text-white cursor-pointer hover:bg-blue-700'>
                             Join Now

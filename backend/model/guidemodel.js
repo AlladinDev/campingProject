@@ -49,7 +49,7 @@ const schema = mongoose.Schema({
     },
     tripId: [{
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'tripmodel',
+        ref: 'tripdatabase',
         default: null
     }],
     userType:{

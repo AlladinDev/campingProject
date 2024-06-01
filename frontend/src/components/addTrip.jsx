@@ -64,7 +64,7 @@ const TripForm = () => {
       console.log(response)
       setApiSuccess('Trip Added Successfully')
       const tripsResponse = await axios.get('http://localhost:8000/api/trips/getalltrips')
-      dispatch(addTrip(tripsResponse.response.data.trips))//add latest trips to redux
+      
     }
     catch (err) {
       setApiError('oops something went wrong')

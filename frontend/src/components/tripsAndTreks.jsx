@@ -1,20 +1,8 @@
 import React from 'react'
-import axios from 'axios'
-import { useEffect, useState } from 'react'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { addTrip } from '../redux/tripsSlice'
 function TripsAndTreks() {
-    const [trips, setTrips] = useState([])
-    const dispatch = useDispatch()
-    const fetchData = async () => {
-        
-        const response = await axios.get('http://localhost:8000/api/trips/getalltrips')
-        dispatch(addTrip(response.data.trips))
-        setTrips(response.data.trips)
-    }
-    useEffect(() => {
-        fetchData()
-    }, [])
+    const trips = useSelector((state) => state.tripStore.tripData)
     return (
         <div className='flex justify-around gap-2 my-2 flex-wrap items-center'>
             {

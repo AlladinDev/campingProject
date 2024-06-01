@@ -43,7 +43,7 @@ const schema = mongoose.Schema({
     },
     tripid: [{
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'tripmodel',
+        ref: 'tripdatabase',
         default: null
     }],
     password: {

@@ -1,43 +1,48 @@
 const adminmodel = require("../model/adminmodel");
-const sendMail = require('../email.js')
+const { sendOtp, verifyOtp } = require('../email.js')
+const jwtTokenGenerator = require('../assets/jwtTokenGenerator.js')
 const { hashpassword, bcryptverify } = require('../assets/hashing')
 const cloudinary = require('cloudinary').v2
-const jwt = require('jsonwebtoken');
-let otp = null//global otp variable
-let time = null//time otp will be valid in this time only
 const admincontroller = (req, res) => {
   res.send("admin controller")
 }
-const tokengenerator = async (req, res) => {//function for keeping admin logged in by using jwt token invoked from otp form
-  //first check if otp verification successfully or not
+const sendOtpFunction = async (req, res) => {
   try {
-    const presentTime = new Date().getSeconds()
-    const { otp: receivedOtp, email, username, userType } = req.body
-    console.log('request data is', req.headers.deviceid, email, receivedOtp)
-    const deviceId = req.headers.deviceid
-    if (!receivedOtp)
-      return res.status(400).json({ success: false, message: "enter otp sent to registered email" })
-    if (presentTime - time > 15000) {
-      console.log("timeout", presentTime - time)
-      return res.status(401).json({ success: false, message: "otp timeout" })
-    }
-    console.log('otp comparison ', receivedOtp == otp)
-    if (receivedOtp != otp)//if wrong otp send error message
-      return res.status(401).json({ success: false, message: "unauthorised admin" })
-    //now generate jwt token with emailID and deviceid and send it back
-    jwt.sign({ email, deviceId, userType, username }, "secretkey", (err, token) => {
-      if (err) {
-        return res.status(500).json({ success: false, message: "failure while generating auth token" })
-      }
-      else {
-        console.log('token is', token)
-        return res.status(200).cookie('AuthCookie', token, { maxAge: 1814400000 }).json({ success: true, message: 'admin authenticated' })
-      }
-    })
+    const { email, userType } = req.body
+    if (!email || !userType)
+      return res.status(400).json({ message: "InSufficient Data Provided" })
+    const userExists = await adminmodel.findOne({ email: email })
+    if (!userExists)
+      return res.status(404).json({ message: "User Not Found" })
+    await sendOtp(email)
+    return res.status(200).json({ message: "Otp Sent SuccessFully" })
   }
   catch (err) {
-    console.log('err in ')
-    res.status(500).json({ success: false, message: "oops something went wrong in token generator" })
+    console.log('err in sendotp function in adminController', err)
+    return res.status(500).json({ message: "Server Error" })
+
+  }
+}
+
+const verifyOtpFunction = async (req, res) => {
+  try {
+    const { email, userType, otp, deviceId } = req.body
+    if (!email || !userType || !deviceId)
+      return res.status(400).json({ message: "InSufficient Data Provided" })
+    const userExists = await adminmodel.findOne({ email: email })
+    if (!userExists)
+      return res.status(404).json({ message: "User Not Found" })
+    await verifyOtp(req.body.otp)//if error or wrong otp control passes to catch block automatically
+    const { error, data } = await jwtTokenGenerator({ email, userType, deviceId })
+    if (error)
+      return res.status(500).json({ message: "Jwt Signing Error" })
+    console.log('jwt token is', data)
+    return res.status(200).cookie('AuthCookie', data, { maxAge: 1814400000 }).json({ success: true, message: 'user authenticated' })
+  }
+  catch (err) {
+    console.log('err in verifyotp function in adminController', err)
+    return res.status(500).json({ message: "Server Error" })
+
   }
 }
 const logincontroller = async (req, res) => {
@@ -54,12 +59,7 @@ const logincontroller = async (req, res) => {
     if (!isPasswordCorrect)
       return res.status(401).json({ success: false, message: "invalid credientials" })
     //send mail with otp for added security and identifying true admin
-    const mailResponse = await sendMail(useremail)
-    time = new Date().getSeconds()
-    console.log(time)
-    console.log('male respoonse is', mailResponse)
-    otp = mailResponse
-    return res.status(200).json({ success: true, message: 'otp sent successfully', userType: adminPresent.userType, username: adminPresent.username })
+    return res.status(200).json({ success: true, message: 'Login Successfull Go For Otp' })
   }
   catch (err) {
     console.log('error in adminlogin function ', err)
@@ -142,7 +142,6 @@ module.exports = {
   updatecontroller,
   registercontroller,
   logincontroller,
-  tokengenerator,
-
-
+  sendOtpFunction,
+  verifyOtpFunction
 }

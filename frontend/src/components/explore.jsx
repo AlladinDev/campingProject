@@ -61,6 +61,7 @@ function Explore() {
                 <h1>Moderate-Diffult</h1>
                 <hr />
                 <div className='w-full py-2 my-2'>
+                  <button onClick={payment}>JOin now</button>
                   <button className='w-full py-2 rounded-full bg-blue-700 text-white text-2xl' onClick={() => navigate(`/tripinfo/${trip._id}`)}>Get Trip info</button>
                 </div>
             </div>

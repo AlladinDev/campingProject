@@ -11,7 +11,7 @@ const checkAuthStatus = async (req, res) => {
       return res.status(403).json({ success: false, message: "token not present" })
     let jwtValue = null//variable to store value encoded in jwt token
     let flag=false
-    jwt.verify(token, 'secretkey', (err, value) => {
+    jwt.verify(token, 'SecretKey', (err, value) => {
       if (err)
       {
         flag=true
@@ -38,10 +38,10 @@ const checkAuthStatus = async (req, res) => {
         user = await adminmodel.findOne({ email: jwtValue.email }, {  password: 0, __v: 0 })
         break;
       case "user":
-        user = await usermodel.findOne({ email: jwtValue.email }, {  password: 0, __v: 0 })
+        user = await usermodel.findOne({ email: jwtValue.email }, {  password: 0, __v: 0 }).populate('tripid')
         break;
       case "guide":
-        user = await guidemodel.findOne({ email: jwtValue.email }, {  password: 0, __v: 0 })
+        user = await guidemodel.findOne({ email: jwtValue.email }, {  password: 0, __v: 0 }).populate('tripId')
         break;
       default:
         user = null

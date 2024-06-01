@@ -22,7 +22,7 @@ const schema = mongoose.Schema({
     },
     guideAllotted: {
         type:mongoose.Schema.Types.ObjectId,
-        ref:guidedb
+        ref:'guidedatabase'
     },
     photo: {
         type: String,

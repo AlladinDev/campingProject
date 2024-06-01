@@ -7,6 +7,7 @@ const userSlice = createSlice({
         authStatus: false,
         username:'',
         userType:'',
+        userEmail:''
     
     },
     reducers: {
@@ -19,8 +20,8 @@ const userSlice = createSlice({
         addUserType: (state, action) => {
             state.userType = action.payload
         },
-        addUserName: (state, action) => {
-            state.username = action.payload
+        addUserEmail: (state, action) => {
+            state.userEmail = action.payload
         },
         addUser:(state, action) =>{
            
@@ -29,4 +30,4 @@ const userSlice = createSlice({
     }
 })
 export default userSlice.reducer
-export const { addDeviceID, addAuthStatus ,addUserType,addUserName,addUser} = userSlice.actions
+export const { addDeviceID, addAuthStatus ,addUserType,addUserEmail,addUser} = userSlice.actions
