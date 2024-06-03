@@ -30,7 +30,7 @@ app.use(cookieparser({//set cookie settings
     sameSite: 'none'
 }))
 app.use(cors({
-    origin: true, // Allow requests from any origin
+    origin:true, // Allow requests from any origin
     methods: ['GET', 'POST', 'PUT', 'DELETE'], // Allow only specific HTTP methods
     credentials: true // Allow credentials (cookies, authorization headers, etc.)
   }));

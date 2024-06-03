@@ -1,3 +1,4 @@
+const { v4: uid } = require('uuid');
 const mongoose = require('mongoose')
 const schema = mongoose.Schema({
     username: {

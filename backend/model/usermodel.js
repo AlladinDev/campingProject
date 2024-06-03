@@ -1,4 +1,4 @@
-
+const { v4: uid } = require('uuid');
 const tripmodel=require('./tripmodel')
 const mongoose = require('mongoose')
 const schema = mongoose.Schema({
@@ -41,7 +41,7 @@ const schema = mongoose.Schema({
         type: String,
         required: true
     },
-    tripid: [{
+    tripId: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'tripdatabase',
         default: null

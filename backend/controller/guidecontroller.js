@@ -1,9 +1,11 @@
 const guidemodel = require('../model/guidemodel')
+const usermodel = require("../model/usermodel");
+const adminmodel = require("../model/adminmodel");
 const cloudinary = require('cloudinary').v2
 const { sendOtp, verifyOtp } = require('../email')
 const { bcryptverify } = require('../assets/hashing')
 const { hashpassword } = require('../assets/hashing')
-const jwtTokenGenerator=require('../assets/jwtTokenGenerator')
+const jwtTokenGenerator = require('../assets/jwtTokenGenerator')
 const { get } = require('../routes/userRoutes')
 const getAllGuides = async (req, res) => {
   try {
@@ -18,7 +20,7 @@ const getAllGuides = async (req, res) => {
 }
 const getGuideData = async (req, res) => {
   try {
-    const users = await guidemodel.find({email:req.body.email}, { __v: 0, password: 0, photoid: 0 }).populate('tripId')
+    const users = await guidemodel.findOne({ email: req.body.email }, { password: 0, __v: 0, photoId: 0 }).populate('tripId')
     return res.status(200).json({ users: users })
   }
   catch (err) {
@@ -33,10 +35,16 @@ const guideRegistration = async (req, res) => {
   let GuideUploadedPhoto = null;
   let user = null //variable to store user document created using usermode.create()
   try {
-    const userExists = guidemodel.findOne({ email: req.body.email })
-    const mobileExists = guidemodel.findOne({ mobile: req.body.mobile })
-    const [existinguser, existingmobile] = await Promise.all([userExists, mobileExists])
-    if (existinguser || existingmobile)
+    const [A, B, C, D, E, F] = await Promise.all(
+      [usermodel.findOne({ email: req.body.email }),
+      usermodel.findOne({ mobile: req.body.mobile }),
+      guidemodel.findOne({ mobile: req.body.mobile }),
+      guidemodel.findOne({ email: req.body.email }),
+      adminmodel.findOne({ mobile: req.body.mobile }),
+      adminmodel.findOne({ email: req.body.email })
+      ]
+    )
+    if (A || B || C || D || E || F)
       return res.status(403).json({ failure: true, message: "this email or mobile already exists" })
     guidephoto = req.body.photo;
     console.log('guide photo is', guidephoto)
@@ -89,19 +97,20 @@ const sendOtpFunction = async (req, res) => {
   }
 }
 
-const verifyOtpFunction = async (req,res) => {
+const verifyOtpFunction = async (req, res) => {
   try {
-    const { email, userType,otp,deviceId } = req.body
-    if (!email || !userType||!deviceId)
+    const { email, userType, otp, deviceId } = req.body
+    if (!email || !userType || !deviceId)
       return res.status(400).json({ message: "InSufficient Data Provided" })
-    const userExists = await guidemodel.findOne({ email: email })
+    const userExists = await guidemodel.findOne({ email: email }).populate('tripId')
     if (!userExists)
       return res.status(404).json({ message: "User Not Found" })
     await verifyOtp(req.body.otp)//if error or wrong otp control passes to catch block automatically
-    const {err,data}=await jwtTokenGenerator({email,userType,deviceId})
-    if(err)
-      return res.status(500).json({message:"Jwt Signing Error"})
-    return res.status(200).cookie('AuthCookie', data, { maxAge: 1814400000 }).json({ success: true, message: 'user authenticated' })
+    const { err, data } = await jwtTokenGenerator({ email, userType, deviceId })
+    if (err)
+      return res.status(500).json({ message: "Jwt Signing Error" })
+    const { _id, __v, photoId, password, ...necessaryData } = userExists.toObject()
+    return res.status(200).cookie('AuthCookie', data, { maxAge: 1814400000 }).json({ success: true, message: 'user authenticated', user: necessaryData })
   }
   catch (err) {
     console.log('err in verifyotp function in guidecontroller', err)

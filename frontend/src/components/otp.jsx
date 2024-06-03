@@ -3,7 +3,7 @@ import { React, useState, useEffect } from 'react'
 import { FaShieldAlt } from 'react-icons/fa';
 import { useLocation, useNavigate} from 'react-router-dom';
 import {useDispatch,useSelector} from 'react-redux'
-import { addUserType,addAuthStatus,addUserEmail } from '../redux/userSlice';
+import { addUserType,addAuthStatus,addUserEmail ,addUser} from '../redux/userSlice';
 function EmailOtpVerification() {
     const location = useLocation()
     const dispatch = useDispatch()
@@ -27,6 +27,7 @@ function EmailOtpVerification() {
             dispatch(addAuthStatus(true))
             dispatch(addUserEmail(email))
             dispatch(addUserType(userType))
+            dispatch(addUser(response.data.user))
         }
         catch (err) {
             console.log('err is', err)
@@ -85,7 +86,7 @@ function EmailOtpVerification() {
     return (
         <div className='w-full flex flex-col sm:flex-row gap-5 justify-center items-center px-4 min-h-[90vh]'>
             <div className='w-full flex justify-center items-center sm:w-[50%] h-[70vh] sm:h-[90vh] '>
-                <img src="../../loginform.jpg" alt="" className='bg-cover bg-no-repeat' />
+                <img src="../../otpdesignpic.png" alt="" className='bg-cover bg-no-repeat' />
             </div>
             <div className='  w-full sm:w-[50%] h-[70vh] sm:h-[90vh] flex justify-center items-center'>
                 <div className='w-[23rem] aspect-auto bg-[#ffff] shadow-md'>

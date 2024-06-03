@@ -41,8 +41,8 @@ function Explore() {
   return (
     <div className='flex justify-around gap-3 my-2 flex-wrap p-2  items-center bg-[#FEFAF6] min-h-[90vh]'>
       {
-        trips && trips.map((trip, keys) => (
-          <div key={keys} className="w-full min-[670px]:max-w-[380px] min-[670px]:h-[29rem]  bg-white shadow-lg border hover:scale-105 hover:text-black transition duration-700 border-black rounded-lg p-3 ">
+        trips.length ? trips.map((trip, keys) => (
+          <div key={keys} className="w-full min-[670px]:max-w-[380px] min-[670px]:min-h-[29rem]  bg-white shadow-lg border hover:scale-105 hover:text-black transition duration-700 border-black rounded-lg p-3 ">
             <div className='w-full'>
               <img
                 className="w-full  max-h-[23rem] object-fit border border-black"
@@ -52,21 +52,25 @@ function Explore() {
             </div>
             <div className="py-4 px-6 w-full">
               <h2 className="text-xl  text-center font-semibold text-gray-800 mb-2">
-                {trip.destination.split[0]}
+                {trip.destination}
               </h2>
               <h1 className="text-lg my-1 text-black">
                 Date: {trip.date}
               </h1>
+              <h1>Trip Id : {trip._id}</h1>
+              <hr />
               <h1 className='my-1'>Duration :{trip.tripDuration} Days</h1>
-                <h1>Moderate-Diffult</h1>
-                <hr />
-                <div className='w-full py-2 my-2'>
-                  <button onClick={payment}>JOin now</button>
-                  <button className='w-full py-2 rounded-full bg-blue-700 text-white text-2xl' onClick={() => navigate(`/tripinfo/${trip._id}`)}>Get Trip info</button>
-                </div>
+              <h1>Difficulty:Moderate</h1>
+              <hr />
+
+            </div>
+            <div className='w-full flex justify-center items-center  py-2 my-2'>
+              <button className='w-full py-2 rounded-full bg-blue-700 text-white text-2xl' onClick={() => navigate(`/tripinfo/${trip._id}`)}>Get Trip info</button>
             </div>
           </div>
-        ))
+        )) : <div className='min-h-[90vh] w-full flex justify-center items-center'>
+          <h3 className='text-2xl text-center text-black p-9 shadow-lg rounded-md flex justify-center items-center  min-h-[12rem] hover:scale-105 transition-all duration-500 bg-white'>Sorry We haven't planned Any Trip yet</h3>
+        </div>
       }
 
     </div>

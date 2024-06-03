@@ -53,6 +53,7 @@ const Form = () => {
     setErrors()
     e.preventDefault()
     console.log('data received in handlesubmit  function is', formData)
+    formData.userType='guide'
     const { err, errors, data } = validator(formData)//returns err:boolean,errors:object,data:actual data
     console.log(errors)
     setErrors(errors)//set error messages if any
@@ -72,13 +73,10 @@ const Form = () => {
         }
       })
       setSubmittingMsg('')
-      setApiSuccess('user registered successfully')
+      setApiSuccess('Guide registered successfully')
       console.log('api response is', result)
       setSubmitting(false)
       dispatch(addAnotherMember(result.data.user))//add member added to redux store
-      
-
-
     }
     catch (error) {
       setSubmitting(false)
@@ -199,14 +197,6 @@ const Form = () => {
             className="border border-gray-400 rounded px-3 py-2 w-full"
           />
           {errors.photo && <div className="text-red-500">{errors.photo}</div>}
-        </div>
-        <div className="mb-4">
-          <select name="userType" value={formData.userType} onChange={handleChange} className="border appearance-none border-gray-400 rounded px-3 py-2 w-full">
-            <option value=''>User Type</option>
-            <option value="admin">Admin</option>
-            <option value="user">User</option>
-            <option value="guide" >Guide</option>
-          </select>
         </div>
         <button type="submit" disabled={isSubmitting} className="bg-blue-500 text-white px-4 py-2 rounded w-[100%] block mx-auto hover:bg-blue-600">
           {isSubmitting ? 'Submitting' : "Submit"}

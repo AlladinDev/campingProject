@@ -1,6 +1,8 @@
 const mongoose = require('mongoose')
-const schema = mongoose.Schema({
+const { v4: uid } = require('uuid');
+const schema = mongoose.Schema({  
     username: {
+
         type: String,
         required: true
     },

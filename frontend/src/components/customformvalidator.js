@@ -1,71 +1,63 @@
 const isValidEmail = (email) => {
-    // Very basic email validation, you might want to use a more robust solution
-    const re = /\S+@\S+\.\S+/;
+    const re = /^[A-Za-z0-9._%+-]+@gmail\.com$/;
     return re.test(email);
 };
+const removeWhiteSpaces = (data) => {
+    for (let key in data) {
+        if (key !=='photo') {
+           data[key] = data[key].trim()
+        }
+    }
+    console.log('sanitised data is', data)
+    return data
+}
+
+
 const validator = (formData) => {
-
     const newErrors = {};
-    // Simple validation
-    if (formData.username === '' || formData.username.length < 3) {
-        if (formData.username == '')
-            newErrors.username = 'name cannot be empty'
-        else
-            newErrors.username = 'name should not be less than 3 characters '
-    }
-    if (formData.age === '' || formData.age < 15 || formData.age > 70) {
-        if (formData.age == "")
-            newErrors.age = 'age cannot be empty'
-        else
-            newErrors.age = "age should be between 15 and 70 yrs"
-    }
-    if (formData.experience === '') {
-        newErrors.experience = 'enter your experience )'
 
-    }
-    if (formData.qualification === '') {
-        newErrors.qualification = 'enter your experience )'
+    // Validate username (allow letters, digits, and spaces)
+    const usernameRegex = /^[A-Za-z\s]+$/;
+    if (!usernameRegex.test(formData.username)) {
+        newErrors.username = 'Invalid username format';
     }
 
+    // Validate age
+    if (formData.age === '' || !/^(1[5-9]|[2-6][0-9]|70)$/.test(formData.age)) {
+        newErrors.age = '15 to 70 yrs age required';
+    }
 
-    if (formData.gender === '') {
-        newErrors.gender = 'Gender is required';
+    // Validate mobile number
+    if (formData.mobile === '' || !/^\d{10}$/.test(formData.mobile)) {
+        newErrors.mobile = 'Valid 10 digit mobile number required';
     }
-    if (formData.mobile === '' || formData.mobile.length !== 10) {
-        if (formData.mobile == "")
-            newErrors.mobile = 'mobile number cannot be empty'
-        else
-            newErrors.mobile = 'mobile number must be 10 digits long'
 
+    // Validate email
+    if (formData.email === '' || !isValidEmail(formData.email)) {
+        newErrors.email = 'Invalid email format (must end with @gmail.com)';
     }
-    if (formData.email === '') {
-        newErrors.email = 'Email is required';
-    } else if (!isValidEmail(formData.email)) {
-        newErrors.email = 'Invalid email format';
+
+    // Validate password (at least 8 characters with mix of characters)
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+    if (!passwordRegex.test(formData.password)) {
+        newErrors.password =
+            'Strong Password use mix(num,chars,uppercase,lowercase)';
     }
-    if (formData.password === '' || formData.password.length < 8) {
-        if (formData.password == "")
-            newErrors.password = 'Password is required';
-        else
-            newErrors.password = 'password must be atleast 8 digits long'
-    }
-    if (formData.address === '') {
-        newErrors.address = 'Address is required';
-    }
+
+    // Validate address (no specific regex needed)
+
+    // Check if photo is provided
     if (formData.photo === null) {
         newErrors.photo = 'Photo is required';
     }
 
     if (Object.keys(newErrors).length > 0) {
-    
-        return { err: true, errors: newErrors, data: formData }
-    }
-    else {
-        // Submit form
-        console.log('guide validation passed in frontend')
-        return { err: false, errors:'', data: formData }
-
+        return { err: true, errors: newErrors, data: formData };
+    } else {
+        formData = removeWhiteSpaces(formData)
+        console.log('Guide validation passed in frontend');
+        return { err: false, errors: '', data: formData };
     }
 };
-export default validator
 
+export default validator;

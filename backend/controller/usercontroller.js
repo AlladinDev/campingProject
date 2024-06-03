@@ -1,8 +1,11 @@
 const usermodel = require("../model/usermodel");
-const {sendOtp,verifyOtp} = require('../email.js')
+const guidemodel = require("../model/guidemodel");
+const adminmodel = require("../model/adminmodel");
+const { sendOtp, verifyOtp } = require('../email.js')
 const { hashpassword, bcryptverify } = require('../assets/hashing')
 const cloudinary = require('cloudinary').v2
-const jwtTokenGenerator=require('../assets/jwtTokenGenerator.js')
+const { ObjectId } = require('mongodb')
+const jwtTokenGenerator = require('../assets/jwtTokenGenerator.js')
 let otp = null//global otp variable
 let time = null//time otp will be valid in this time only
 const allUsersController = async (req, res) => {
@@ -33,19 +36,19 @@ const sendOtpFunction = async (req, res) => {
   }
 }
 
-const verifyOtpFunction = async (req,res) => {
+const verifyOtpFunction = async (req, res) => {
   try {
-    const { email, userType,otp,deviceId } = req.body
-    if (!email || !userType ||!deviceId)
+    const { email, userType, otp, deviceId } = req.body
+    if (!email || !userType || !deviceId)
       return res.status(400).json({ message: "InSufficient Data Provided" })
     const userExists = await usermodel.findOne({ email: email })
     if (!userExists)
       return res.status(404).json({ message: "User Not Found" })
     await verifyOtp(req.body.otp)//if error or wrong otp control passes to catch block automatically
-    const {err,data}=await jwtTokenGenerator({email,userType,deviceId})
-    if(err)
-      return res.status(500).json({message:"Jwt Signing Error"})
-    return res.status(200).cookie('AuthCookie', data, { maxAge: 1814400000 }).json({ success: true, message: 'user authenticated' })
+    const { err, data } = await jwtTokenGenerator({ email, userType, deviceId })
+    if (err)
+      return res.status(500).json({ message: "Jwt Signing Error" })
+    return res.status(200).cookie('AuthCookie', data, { maxAge: 1814400000 }).json({ success: true, message: 'user authenticated', user: userExists })
   }
   catch (err) {
     console.log('err in verifyotp function in adminController', err)
@@ -67,7 +70,7 @@ const userlogincontroller = async (req, res) => {
     if (!isPasswordCorrect)
       return res.status(401).json({ success: false, message: "invalid credientials" })
     //send mail with otp for added security and identifying true user
-    return res.status(200).json({ success: true, message: 'Login Successfull Go For Otp'})
+    return res.status(200).json({ success: true, message: 'Login Successfull Go For Otp' })
   }
   catch (err) {
     console.log('error in userlogin function ', err)
@@ -81,13 +84,17 @@ const registercontroller = async (req, res) => {
   let uploadedphoto = null
   let user = null //variable to store user document created using usermode.create()
   try {
-
     //check if user is already registered
-    const [existinguser, existingmobile] = await Promise.all(
+    const [A, B, C, D, E, F] = await Promise.all(
       [usermodel.findOne({ email: req.body.email }),
-      usermodel.findOne({ mobile: req.body.mobile })]
+      usermodel.findOne({ mobile: req.body.mobile }),
+      guidemodel.findOne({ mobile: req.body.mobile }),
+      guidemodel.findOne({ email: req.body.email }),
+      adminmodel.findOne({ mobile: req.body.mobile }),
+      adminmodel.findOne({ email: req.body.email })
+      ]
     )
-    if (existinguser || existingmobile)
+    if (A || B || C || D || E || F)
       return res.status(403).json({ failure: true, message: "this email or mobile already exists" })
     uploadedphoto = await cloudinary.uploader.upload(req.body.photo)
     req.body.photo = uploadedphoto.secure_url;
@@ -146,14 +153,20 @@ const updatecontroller = async (req, res) => {
   }
 }
 const addTripController = async (req, res) => {
+  let isPresent = ''
   try {
     const { email, tripId } = req.body;
     if (!email || !tripId)
       return res.status(400).json({ message: "insufficient inputs" })
-    const isPresent = await usermodel.findOne({ email: email })
+    isPresent = await usermodel.findOne({ email: email })
     if (!isPresent)
       return res.status(404).json({ message: "user not found" })
-    isPresent.tripid.push(tripId)
+    const tripIdObject = new ObjectId(tripId)
+    console.log('obj created is', tripIdObject)
+    const alreadyEnrolled = await usermodel.findOne({ tripId: tripIdObject })
+    if (alreadyEnrolled)
+      return res.status(403).json({ message: 'Already Joined This trip' })
+    isPresent.tripId.push(tripId)
     await isPresent.save()
     return res.status(200).json({ message: 'trip added for user successfully' })
   }

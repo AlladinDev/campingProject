@@ -46,7 +46,9 @@ const TripForm = () => {
       }));
     }
   };
+ const validateData=(data)=>{
 
+ }
   const handleSubmit = async (e) => {
     e.preventDefault()
     setApiError('')
@@ -56,15 +58,19 @@ const TripForm = () => {
     setSubmitting(true)
 
     try {
+      console.log(tripData)
       const response = await axios.post('http://localhost:8000/api/trips/addtrip', tripData, {
         headers: {
           'Content-Type': "multipart/form-data"
         }
       })
       console.log(response)
-      setApiSuccess('Trip Added Successfully')
-      const tripsResponse = await axios.get('http://localhost:8000/api/trips/getalltrips')
-      
+      setApiSuccess("Trip Added Successfully")
+      dispatch(addTrip(response.data.trip))
+      setSubmitting(false)
+      // setApiSuccess('Trip Added Successfully')
+      // const tripsResponse = await axios.get('http://localhost:8000/api/trips/getalltrips')
+
     }
     catch (err) {
       setApiError('oops something went wrong')
@@ -76,42 +82,42 @@ const TripForm = () => {
   };
   return (
     <div className="max-w-sm mx-auto bg-white bg-opacity-15 backdrop-blur-lg text-black p-6 border border-gray rounded-lg shadow-lg">
-      <h2 className="text-2xl font-semibold mb-4">Add New Trip</h2>
-      <h2 className='text-black text-center font-serif'>{apiMsg && apiMsg}</h2>
-      <h2 className='text-red-600 text-center font-serif'>{apiErr && apiErr}</h2>
-      <h2 className='text-blue-600 text-center font-serif'>{apiSuccess && apiSuccess}</h2>
+      <h2 className="text-2xl text-white font-semibold mb-4">Add New Trip</h2>
+      <h2 className='text-white text-center font-serif'>{apiMsg && apiMsg}</h2>
+      <h2 className='text-white text-2xl text-center font-serif'>{apiErr && apiErr}</h2>
+      <h2 className='text-white  text-2xl text-center font-serif'>{apiSuccess && apiSuccess}</h2>
 
       <form onSubmit={handleSubmit}>
         <div className="mb-4">
-          <label htmlFor="destination" className="block text-gray-700 font-semibold mb-2 ">Destination</label>
+          <label htmlFor="destination" className="block text-white font-semibold mb-2 ">Destination</label>
           <input type="text" id="destination" name="destination" value={tripData.destination} onChange={handleChange} className="input border border-black w-full py-2 px-4" />
         </div>
         <div className="mb-4">
-          <label htmlFor="photo" className="block text-gray-700 font-semibold mb-2">Photos</label>
+          <label htmlFor="photo" className="block text-white font-semibold mb-2">Photos</label>
           <input type="file" id="photo" name="photo" onChange={handleChange} className="input w-full py-2 px-4 border border-black" />
         </div>
         <div className="mb-4">
-          <label htmlFor="date" className="block text-gray-700 font-semibold mb-2">Trip Date</label>
+          <label htmlFor="date" className="block text-white font-semibold mb-2">Trip Date</label>
           <input type="date" id="Date" name="date" value={tripData.date} onChange={handleChange} className="input w-full py-2 px-4 border border-black" />
         </div>
         <div className="mb-4">
-          <label htmlFor="text" className="block text-gray-700 font-semibold mb-2">Trek Duration</label>
+          <label htmlFor="text" className="block text-white font-semibold mb-2">Trek Duration</label>
           <input type="text" id="tripDuration" name="tripDuration" value={tripData.tripDuration} onChange={handleChange} className="input w-full py-2 px-4 border border-black" />
         </div>
         <div className="mb-4">
-          <label htmlFor="pickupPlace" className="block text-gray-700 font-semibold mb-2">Pickup Place</label>
+          <label htmlFor="pickupPlace" className="block text-white font-semibold mb-2">Pickup Place</label>
           <input type="text" id="pickupPlace" name="pickUpPlace" value={tripData.pickUpPlace} onChange={handleChange} className="input w-full border border-black py-2 px-4" />
         </div>
         <div className="mb-4">
-          <label htmlFor="price" className="block text-gray-700 font-semibold mb-2">Amount To Be Paid</label>
+          <label htmlFor="price" className="block text-white font-semibold mb-2">Amount To Be Paid</label>
           <input type="tel" id="price" name="price" value={tripData.price} onChange={handleChange} className="input w-full border border-black py-2 px-4" />
         </div>
         <div className="mb-4">
-          <label htmlFor="placedescription" className="block text-gray-700 font-semibold mb-2">Description</label>
+          <label htmlFor="placedescription" className="block text-white font-semibold mb-2">Description</label>
           <input type="text" id="description" name="description" value={tripData.description} onChange={handleChange} className="input w-full border border-black py-2 px-4" />
         </div>
         <div className="mb-4">
-          <label htmlFor="whatIsIncluded" className="block text-gray-700 font-semibold mb-2">what's Included</label>
+          <label htmlFor="whatIsIncluded" className="block text-white font-semibold mb-2">what's Included</label>
           <input type="text" id="tripIncludedServices" name="tripServices" value={tripData.tripServices} onChange={handleChange} className="input w-full border border-black py-2 px-4" />
         </div>
         <div className="mb-4">
@@ -125,7 +131,8 @@ const TripForm = () => {
           </select>
 
         </div>
-        <button disabled={isSubmitting} type="submit" className="btn w-full p-3 shadow-sm transition duration-600 bg-blue-400 hover:bg-blue-600">{isSubmitting ? "Submitting..." : "Submit"}</button>
+        <button disabled={isSubmitting} type="submit" className=" text-2xl w-full p-3 shadow-sm transition duration-600 text-white bg-blue-400 hover:bg-blue-600">{isSubmitting ? "Submitting..."   : "Submit"}
+        </button>
       </form>
     </div>
   );

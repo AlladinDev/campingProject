@@ -1,29 +1,45 @@
 import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCampground, faPhone, faFire, faHiking, faMapMarkedAlt, faStar, faTree } from '@fortawesome/free-solid-svg-icons';
 import MapComponent from './leafletmap';
 import useweatherdata from './useweatherdata';
 import Weathercard from './weathercard';
+import { loadStripe } from '@stripe/stripe-js';
 export default function TripInfo() {
     const { id: tripId } = useParams()
+    console.log(tripId)
     const trip = useSelector((state) => state.tripStore.tripData);
-   
-   const [weatherErr, setWeatherErr] = useState('');
+    const AuthStatus= useSelector((state) => state.user.authStatus);
+    console.log('tripstore is',trip)
+    const [weatherErr, setWeatherErr] = useState('');
+    const [joining, setJoining] = useState(false);
     const tripData = trip.filter((item) => item._id === tripId)[0];
     console.log('tridata is', tripData)
-    const [weatherInfo, weatherApiErr] = useweatherdata(tripData.destination);
-
+    const [weatherInfo, weatherApiErr] = useweatherdata(tripData ? tripData.destination : "Srinagar");
     console.log('hi ', weatherInfo)
-    const markers = [
-        { lat: 33.55, lng: 75.25, popupText: 'Destination Site' },
+    const navigate=useNavigate()
 
-        // Add more markers as needed
-    ];
-
-
+    const makePayment = async ({price,tripId}) => {
+        try {
+            console.log('price is', price)
+            const stripe = await loadStripe('pk_test_51PMnMyA1e3ycfevIlPy43SbtxMWAZrQfAOadG1avwUqacj8GCwXrQwybdj9DBS7Euhx846kDqlud8SOhhGBqbP2k00y46sh9Sh');
+            setJoining(true)
+            const session = await axios.post('http://localhost:8000/api/user/check-out-session', { tripPrice: price, tripId:tripId })
+            console.log('sesion is', session)
+            // await stripe.redirectToCheckout({
+            //     sessionId:  session.data.url // Use the session ID from the response
+            // });
+            
+            window.location.href=session.data.url
+        }
+        catch (err) {
+            setJoining(false)
+            console.log(err)
+        }
+    }
     return (
         tripData && (
             <div className='min-h-[90vh] bg-[#FEFAF6]'>
@@ -75,9 +91,9 @@ export default function TripInfo() {
                         <h2 className='p-2 py-2 my-2 rounded-md text-2xl bg-yellow-200'>
                             Contact Guide <a href={`tel:91${tripData.guideAllotted.mobile}`}><FontAwesomeIcon size='2x' icon={faPhone} className='ml-2 text-blue-600' /></a>
                         </h2>
-                        <h2 className='p-2 py-2 w-full bg-blue-600 rounded-md text-white cursor-pointer hover:bg-blue-700'>
-                            Join Now
-                        </h2>
+                        <button  disabled={joining} className='p-2 py-2 w-full bg-blue-600 rounded-md text-white cursor-pointer hover:bg-blue-700' onClick={AuthStatus?() => makePayment({price:tripData.price,tripId:tripData._id}):()=>navigate('/userlogin')}>
+                           {joining ? "Redirecting To PaymentForm":"Join Trip"}
+                        </button>
                     </div>
                     <div className="bg-blue-200 w-full max-w-[480px] rounded-lg shadow-lg my-2 p-9">
                         <h2 className="text-xl font-semibold mb-4">Why Join Us?</h2>

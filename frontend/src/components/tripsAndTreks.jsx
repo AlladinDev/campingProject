@@ -1,12 +1,11 @@
 import React from 'react'
-import { useDispatch, useSelector } from 'react-redux'
-import { addTrip } from '../redux/tripsSlice'
+import {  useSelector } from 'react-redux'
 function TripsAndTreks() {
     const trips = useSelector((state) => state.tripStore.tripData)
     return (
         <div className='flex justify-around gap-2 my-2 flex-wrap items-center'>
             {
-                trips && trips.map((trip, keys) => (
+                trips.length!==0 ? trips.map((trip, keys) => (
                     <div key={keys} className="w-full sm:max-w-[340px] bg-white shadow-lg border hover:bg-blue-300  hover:text-black transition duration-700 border-black rounded-lg overflow-hidden">
                         <img
                             className="w-full h-56 object-cover object-center"
@@ -44,7 +43,9 @@ function TripsAndTreks() {
                             </div>
                         </div>
                     </div>
-                ))
+                )) : <div className='min-h-[90vh] flex justify-center items-center'>
+                    <h3 className='text-2xl text-center text-black p-9 shadow-lg rounded-md flex justify-center items-center  min-h-[12rem] hover:scale-105 transition-all duration-500 bg-white'>No Trips Planned Yet</h3>
+                </div>
             }
         </div>
 

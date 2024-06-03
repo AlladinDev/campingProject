@@ -1,4 +1,5 @@
 const mongoose = require('mongoose')
+const { v4: uid } = require('uuid');
 const guidedb=require('./guidemodel')
 const schema = mongoose.Schema({
     destination: {
@@ -16,7 +17,7 @@ const schema = mongoose.Schema({
     },
 
     date: {
-        type:Date,
+        type:String,
         required: true
 
     },

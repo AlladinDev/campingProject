@@ -32,13 +32,13 @@ const checkAuthStatus = async (req, res) => {
     return 
     //now fetch user data using email stored in jwt token
     let user = null//variable to store user data from db
-    console.log(jwtValue.userType)
+
     switch (jwtValue.userType) {
       case "admin":
         user = await adminmodel.findOne({ email: jwtValue.email }, {  password: 0, __v: 0 })
         break;
       case "user":
-        user = await usermodel.findOne({ email: jwtValue.email }, {  password: 0, __v: 0 }).populate('tripid')
+        user = await usermodel.findOne({ email: jwtValue.email }, {  password: 0, __v: 0 }).populate('tripId')
         break;
       case "guide":
         user = await guidemodel.findOne({ email: jwtValue.email }, {  password: 0, __v: 0 }).populate('tripId')
@@ -46,7 +46,6 @@ const checkAuthStatus = async (req, res) => {
       default:
         user = null
     }
-    console.log('user from jwt token is', user)
     if (user == null)
       return res.status(400).send('token contains no userType field')
     return res.status(200).json({ success: true, message: "user is valid", username: jwtValue.username, userType: jwtValue.userType, user })

@@ -9,12 +9,12 @@ function Home() {
     const navigate = useNavigate();
     
     // console.log(ref)
-    const options = {method: 'GET', headers: {accept: 'application/json'}};
+    // const options = {method: 'GET', headers: {accept: 'application/json'}};
 
-    fetch('https://api.tomorrow.io/v4/weather/realtime?location=srinagar&apikey=A9cQ2PDmrxiLRpZUI9s4gjCl592GPpAc', options)
-      .then(response => response.json())
-      .then(response => console.log(response))
-      .catch(err => console.error(err));
+    // fetch('https://api.tomorrow.io/v4/weather/realtime?location=srinagar&apikey=A9cQ2PDmrxiLRpZUI9s4gjCl592GPpAc', options)
+    //   .then(response => response.json())
+    //   .then(response => console.log(response))
+    //   .catch(err => console.error(err));
 
     const user = useSelector((state) => state.user.user)
     const advertisementObj = useSelector((state) => state.advertisementStore.advertisement)
@@ -79,12 +79,8 @@ function Home() {
                             <input type="text" id="username" name="username" className="input py-2 border border-black" />
                         </div>
                         <div className="flex flex-col py-2">
-                            <label htmlFor="email" className="text-sm text-white">Email</label>
-                            <input type="email" id="email" name="email" className="input py-2 border border-black" />
-                        </div>
-                        <div className="flex flex-col py-2">
-                            <label htmlFor="subject" className="text-sm text-white">Subject</label>
-                            <input type="text" id="subject" name="subject" className="input py-2 border border-black" />
+                            <label htmlFor="email" className="text-sm text-white">email</label>
+                            <input type="text" id="username" name="username" className="input py-2 border border-black" />
                         </div>
                         <div className="flex flex-col py-2">
                             <label htmlFor="problem" className="text-sm text-white">Describe the problem</label>

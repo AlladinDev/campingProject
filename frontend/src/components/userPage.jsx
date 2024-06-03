@@ -7,7 +7,7 @@ const UserPage = () => {
   console.log(user)
   return (
     <div className="p-12">
-      <Profilepage data={user}/>
+      <Profilepage data={user} heading='Trips Joined'/>
     </div>
   );
 };

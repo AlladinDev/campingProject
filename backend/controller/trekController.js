@@ -16,8 +16,8 @@ const addTrip = async (req, res) => {
         await guide.save()
         console.log('user saved')
         console.log('guide informed about trip successfully')
-        const { _id, __v, photoId, ...obj } = place.toObject()
-        return res.status(200).json({ place: obj })
+        const {  __v, photoId, ...obj } = place.toObject()
+        return res.status(200).json({ trip: obj })
     }
     catch (err) {
         if (uploadedPhoto) {

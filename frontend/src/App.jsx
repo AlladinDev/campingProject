@@ -84,7 +84,7 @@ function App() {
           <Route exact path='/aboutus' element={<AboutUs />} />
           <Route exact path='/explore' element={<Explore />} />
           <Route exact path='/tripinfo/:id' element={<TripInfo />} />
-          <Route exact path='/paymentsuccess' element={<PaymentSuccess />} />
+          <Route exact path='/paymentsuccess/:tripId' element={<PaymentSuccess />} />
           <Route exact path='/paymentfailure' element={<PaymentFailure />} />
           <Route exact path='/userregister' element={<UserRegister />} />
           <Route exact path='/userlogin' element={<LoginForm />} />

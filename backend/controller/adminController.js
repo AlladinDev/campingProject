@@ -1,4 +1,6 @@
 const adminmodel = require("../model/adminmodel");
+const guidemodel = require('../model/guidemodel')
+const usermodel = require("../model/usermodel");
 const { sendOtp, verifyOtp } = require('../email.js')
 const jwtTokenGenerator = require('../assets/jwtTokenGenerator.js')
 const { hashpassword, bcryptverify } = require('../assets/hashing')
@@ -37,7 +39,7 @@ const verifyOtpFunction = async (req, res) => {
     if (error)
       return res.status(500).json({ message: "Jwt Signing Error" })
     console.log('jwt token is', data)
-    return res.status(200).cookie('AuthCookie', data, { maxAge: 1814400000 }).json({ success: true, message: 'user authenticated' })
+    return res.status(200).cookie('AuthCookie', data, { maxAge: 1814400000 }).json({ success: true, user: userExists, message: 'user authenticated' })
   }
   catch (err) {
     console.log('err in verifyotp function in adminController', err)
@@ -73,13 +75,16 @@ const registercontroller = async (req, res) => {
   let uploadedphoto = null
   let admin = null //variable to store admin document created using adminmode.create()
   try {
-
-    //check if admin is already registered
-    const [existingadmin, existingmobile] = await Promise.all(
-      [adminmodel.findOne({ email: req.body.email }),
-      adminmodel.findOne({ mobile: req.body.mobile })]
+    const [A, B, C, D, E, F] = await Promise.all(
+      [usermodel.findOne({ email: req.body.email }),
+      usermodel.findOne({ mobile: req.body.mobile }),
+      guidemodel.findOne({ mobile: req.body.mobile }),
+      guidemodel.findOne({ email: req.body.email }),
+      adminmodel.findOne({ mobile: req.body.mobile }),
+      adminmodel.findOne({ email: req.body.email })
+      ]
     )
-    if (existingadmin || existingmobile)
+    if (A || B || C || D || E || F)
       return res.status(403).json({ failure: true, message: "this email or mobile already exists" })
     uploadedphoto = await cloudinary.uploader.upload(req.body.photo)
     req.body.photo = uploadedphoto.secure_url;
