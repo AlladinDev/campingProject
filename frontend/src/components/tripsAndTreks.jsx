@@ -23,7 +23,10 @@ function TripsAndTreks() {
                                 Trek Duration: {trip.tripDuration}
                             </p>
                             <p className="text-lg text-gray-600">
-                                Services: {trip.tripServices}
+                                Trip Id: {trip._id}
+                            </p>
+                            <p className="text-lg text-gray-600">
+                                Trip Price: {trip.price}
                             </p>
                             <hr />
                             <div className="flex mt-4">
@@ -37,9 +40,6 @@ function TripsAndTreks() {
                                     <p className="text-lg text-gray-600"> Mobile:  {trip.guideAllotted.mobile}</p>
                                 </div>
 
-                            </div>
-                            <div className='w-full my-1'>
-                                <button className='w-full py-2 rounded-full bg-blue-700' onClick={() => `${authStatus ? payment(trip.price, trip._id) : navigate('/userlogin')}`}>Join</button>
                             </div>
                         </div>
                     </div>

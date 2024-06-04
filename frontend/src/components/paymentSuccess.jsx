@@ -11,6 +11,9 @@ export default function PaymentSuccess() {
   const tripInfo = tripData.filter((item) => item._id === tripId)[0];
   const addTripToUser = async () => {
     try {
+      console.log('useremail is', user)
+      if (!user || !Object.keys(user).length)
+        return
       const response = await axios.post('http://localhost:8000/api/user/addtrip', { email: user.email, tripId: tripId })
       console.log(response)
     }

@@ -1,9 +1,9 @@
 // AdminPage.js
-import React from 'react';
+import { React, useState } from 'react';
 import { Link, Outlet } from 'react-router-dom'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useEffect } from 'react';
-import { faHome, faBars, faUsers, faMountain, faImage, faCog, faMessage } from '@fortawesome/free-solid-svg-icons';
+import { faHome, faBars, faUsers,faArrowCircleLeft,faMountain, faImage, faCog, faMessage } from '@fortawesome/free-solid-svg-icons';
 import { useSelector, useDispatch } from 'react-redux';
 import axios from 'axios';
 import { addUsers } from '../redux/allusersSlice';
@@ -11,6 +11,7 @@ import { addMembers } from '../redux/teamMemberSlice';
 import { removeAdvertisement } from '../redux/advertisementSlice';
 const AdminPage = () => {
   const dispatch = useDispatch()
+  const [isOpen, setIsOpen] = useState(false)
   const advertisement = useSelector((state) => state.advertisementStore.advertisement)
   const advertisementPresent = useSelector((state) => state.advertisementStore.advertisementPresent)
   const fetchAllUsers = async () => {
@@ -47,11 +48,14 @@ const AdminPage = () => {
   const user = useSelector((state) => state.user.user)
   return (
     <>
-      <div className="flex custom-scrollbar bg-no-repeat  bg-[url(../../adminpage.jpg)] bg-cover h-[100vh] min-[700px]:h-[92vh]">
+      <div className="flex custom-scrollbar overflow-y-auto bg-no-repeat  bg-[url(../../adminpage.jpg)] bg-cover h-[100vh] min-[700px]:h-[92vh]">
         {/* Sidebar */}
-        <div className="w-65 hidescrollbar bg-white bg-opacity-15 backdrop-blur-lg border border-black rounded overflow-auto shadow-lg ">
+        <div className={`${isOpen ? 'hidden' : ' top-[8vh] absolute left-0 z-10'} overflow-hidden overflow-y-auto  h-[92vh] min-[700px]:block hidescrollbar bg-white bg-opacity-15 backdrop-blur-lg border border-black rounded shadow-lg `}>
           <div className="p-4">
             <h1 className="text-white text-2xl font-semibold mx-auto">Adventure Admin</h1>
+          </div>
+          <div className=' flex justify-center items-center'>
+          <h2 className='' onClick={() => setIsOpen(!isOpen)}> <FontAwesomeIcon icon={faArrowCircleLeft} className="h-10 bg-white p-2 rounded-full w-10 block min-[700px]:hidden" /></h2>
           </div>
           <div className="p-4">
             <h1 className="text-white text-2xl font-semibold">
@@ -91,7 +95,7 @@ const AdminPage = () => {
               <FontAwesomeIcon icon={faMountain} className="h-5 w-5 mr-2" />
               Trips & Treks
             </Link>
-            <Link to="/adminpage/addfeedback" className="flex items-center py-2 px-4 text-white hover:bg-green-700">
+            <Link to="/adminpage/feedbacks" className="flex items-center py-2 px-4 text-white hover:bg-green-700">
               <FontAwesomeIcon icon={faMessage} className="h-5 w-5 mr-2" />
               Feedbacks
             </Link>
@@ -102,11 +106,11 @@ const AdminPage = () => {
           </nav>
         </div>
         {/* Main Content */}
-        <div className="flex-1   h-full   border-2 border-white overflow-auto   text-white bg-no-repeat  ">
+        <div className="flex-1 z-0  h-full   border-2 border-white overflow-auto   text-white bg-no-repeat  ">
           <div className='rightNavbar  border border-black sticky top-0 z-10 text-2xl flex justify-evenly items-center bg-white bg-opacity-20 backdrop-blur-lg py-2 mb-4'>
-            <h2 className='hidden '> <FontAwesomeIcon icon={faBars} className="h-10 w-10 block md:hidden " /></h2>
-            <h2 className='hidden md:block'>Admin Dashboard</h2>
-            <h2>Admin_Name: {user.username}</h2>
+            <h2 className=' ' onClick={() => setIsOpen(!isOpen)}> <FontAwesomeIcon icon={faBars} className="h-10 w-10 block min-[700px]:hidden " /></h2>
+            <h2 className='hidden md:block '>Admin Dashboard</h2>
+            <h2 className='relative '>Admin_Name: {user.username}</h2>
           </div>
           <Outlet />
         </div>
@@ -117,4 +121,3 @@ const AdminPage = () => {
 };
 
 export default AdminPage;
-

@@ -10,6 +10,7 @@ import TripInfo from './components/tripInfo';
 import Advertisement from './components/advertisement';
 import { addAdvertisement } from './redux/advertisementSlice';
 
+
 // Lazy-loaded components
 const Home = lazy(() => import('./components/home'));
 const Explore = lazy(() => import('./components/explore'));
@@ -33,6 +34,8 @@ const TripsAndTreks = lazy(() => import('./components/tripsAndTreks'));
 const Dashboard = lazy(() => import('./components/dashboard'));
 const AddToGallery = lazy(() => import('./components/addtogallery'));
 const AboutUs = lazy(() => import('./components/aboutus'));
+const AllFeedBackMessages = lazy(() => import('./components/adminfeedbacks'))
+const OtpProtected = lazy(() => import('./components/otpProtected'))
 function App() {
 
   const dispatch = useDispatch();
@@ -40,7 +43,6 @@ function App() {
     try {
       const response = await axios.get('http://localhost:8000/api/trips/getalltrips')
       dispatch(addTrip(response.data.trips))
-      console.log('tripdata fom backend is',response)
     }
     catch (err) {
       console.log(err)
@@ -60,12 +62,10 @@ function App() {
     fetchTreks()
     generateFingerprint().then(async (id) => {
       dispatch(addDeviceID(id));
-      console.log('id generated from app.jsx', id);
       const response = await axios.post('http://localhost:8000/api/checkAuthStatus', { userID: id }, {
         withCredentials: true
       });
       if (response.request.status === 200) {
-        console.log('auth response is', response.data);
         dispatch(addUserType(response.data.userType));
         dispatch(addUserEmail(response.data.user.email))
         dispatch(addAuthStatus(true));
@@ -88,7 +88,9 @@ function App() {
           <Route exact path='/paymentfailure' element={<PaymentFailure />} />
           <Route exact path='/userregister' element={<UserRegister />} />
           <Route exact path='/userlogin' element={<LoginForm />} />
-          <Route exact path='/otpform' element={<OtpForm />} />
+          <Route element={<OtpProtected />}>
+            <Route exact path='/otpform' element={<OtpForm />} />
+          </Route>
           <Route element={<Protected />} >
             <Route exact path='/userpage' element={<UserPage />} />
             <Route exact path='/guidepage' element={<GuidePage />} />
@@ -101,6 +103,7 @@ function App() {
               <Route exact path='/adminpage/addmember' element={<AddMember />} />
               <Route exact path='/adminpage/allUsers' element={<AllUsers />} />
               <Route exact path='/adminpage/allmembers' element={<AllMembers />} />
+              <Route exact path='/adminpage/feedbacks' element={<AllFeedBackMessages />} />
               <Route exact path='/adminpage/addtrip' element={<AddTrip />} />
               <Route exact path='/adminpage/tripsAndTreks' element={<TripsAndTreks />} />
             </Route>

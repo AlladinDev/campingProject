@@ -58,7 +58,7 @@ export default function Navbar() {
           </ul>
           <div className='block md:hidden' onClick={() => setOpen(!isOpen)}><FontAwesomeIcon icon={faBars} className='text-[2rem]' /></div>
           <div className='dropdownmenu hidden md:block'>
-            <select className="bg-gray-600 max-w-[16vw] p-2 rounded-full" name='category' onChange={handleChange}>
+            <select className="bg-[#ffff] max-w-[16vw] text-black p-2 rounded-full" name='category' onChange={handleChange}>
               <option value="">Sign in</option>
               <option value="Admin">Admin</option>
               <option value="User">User</option>
@@ -67,7 +67,7 @@ export default function Navbar() {
             </select>
           </div>
         </div>
-        <div className={`btmnav ${isOpen ? `h-[59vh]` : `h-[0vh]`} w-full overflow-hidden  absolute z-10 transition-all  bg-[#4A71E0] top-[8vh] left-0   duration-500 ease-in-out`}>
+        <div className={`btmnav ${isOpen ? `h-[80vh]` : `h-[0vh]`} w-full overflow-hidden  absolute z-40 transition-all  bg-[#4A71E0] top-[8vh] left-0   duration-500 ease-in-out`}>
           <ul className='w-full  p-3 flex flex-col text-2xl py-12 justify-between items-center'>
             <li className=' hover:bg-gray-400 p-3 px-6 rounded-full'>
               <Link to='/'>Home</Link>
@@ -87,6 +87,13 @@ export default function Navbar() {
             </li>
            
           </ul>
+          <select className="bg-[#ffff] text-black text-2xl select select-info w-full p-2 rounded-full" name='category' onChange={handleChange}>
+              <option value="">Sign in</option>
+              <option value="Admin">Admin</option>
+              <option value="User">User</option>
+              <option value="Guide">Guide</option>
+              <option value="/">Home</option>
+            </select>
         </div>
       </nav>
     </header>

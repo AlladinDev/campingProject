@@ -45,6 +45,7 @@ const galleryRoutes= require('./routes/galleryRoutes')
 const advertisementRoutes = require('./routes/advertisementRoutes')
 const parser = require('body-parser')
 const tripRoutes=require('./routes/tripRoutes')
+const feedBackRoutes=require('./routes/feedBackRoutes')
 app.use(fileupload({
     useTempFiles: true
 }))
@@ -59,6 +60,7 @@ app.use("/api/guide", guideRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/trips",tripRoutes)
 app.use("/api/gallery",galleryRoutes)
+app.use('/api/feedback',feedBackRoutes)
 app.use("/api/advertisement",advertisementRoutes)
 
 

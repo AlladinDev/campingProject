@@ -1,20 +1,82 @@
-import React from 'react';
+import { React, useState } from 'react';
 import imagesJson from './frontImages';
 import { useNavigate } from 'react-router-dom';
 import LazyLoad from 'react-lazyload'; // Import LazyLoad
 import { useSelector } from 'react-redux';
-import { useRef } from 'react';
-
+import axios from 'axios'
 function Home() {
     const navigate = useNavigate();
-    
-    // console.log(ref)
-    // const options = {method: 'GET', headers: {accept: 'application/json'}};
+    const [errors, setErrors] = useState({})
+    const [msg, setMsg] = useState('')
+    const [apiError, setApiError] = useState('')
+    const [apiSuccess, setApiSuccess] = useState('')
+    const [submitting, setSubmitting] = useState(false)
+    const validateData = (formData) => {
+        const errors = {}
+        const emailRegex = /^[A-Za-z0-9._%+-]+@gmail\.com$/
+        const textRegex = /^[A-Za-z\s]+$/
+        for (let key in formData) {//remove whitespaces here
+            formData[key] = formData[key].trim()
+        }
+        if (!emailRegex.test(formData.email)) {
+            errors.email = "valid email only eg:example@gmail.com"
+        }
+        if (!textRegex.test(formData.username)) {
+            errors.username = "valid username required"
+        }
+        if (Object.keys(errors).length > 0) {
+            console.log('error created is', errors)
+            return { errFlag: true, errors: errors, formData: formData }
+        }
 
-    // fetch('https://api.tomorrow.io/v4/weather/realtime?location=srinagar&apikey=A9cQ2PDmrxiLRpZUI9s4gjCl592GPpAc', options)
-    //   .then(response => response.json())
-    //   .then(response => console.log(response))
-    //   .catch(err => console.error(err));
+        return { errFlag: false, errors: errors,validData: formData }
+    }
+    const handleChange = (e) => {
+        const { name, value } = e.target
+        console.log('enter',name,value)
+        setErrors({...errors,[name]:''})
+    }
+    const handleSubmit = async (e) => {
+        try {
+            setApiError('')
+            setMsg('')
+            setApiSuccess('')
+            e.preventDefault()
+            const data = new FormData(e.target)
+            const formData = {}
+            data.entries().forEach(([key, value]) => {
+                formData[key] = value
+            })
+            const { errFlag, errors,validData } = validateData(formData)
+            if (errFlag) {
+                setErrors(errors)
+                return
+            }
+            setSubmitting(true)
+            setMsg("Submitting Feedback...")
+           console.log('finalerrors are',errors)
+            const response = await axios.post('http://localhost:8000/api/feedback/addfeedback', validData)
+            setSubmitting(false)
+            setMsg('')
+            setApiSuccess("Feedback Submitted")
+        }
+        catch (err) {
+            console.log(err)
+            setApiSuccess('')
+            setMsg('')
+            setSubmitting(false)
+            if (err.response) {
+                setApiError(err.response.data.message)
+                return
+            }
+            if (err.request) {
+                setApiError("Server Error")
+                return
+            }
+            setApiError("Some Error Occurred")
+
+        }
+    }
 
     const user = useSelector((state) => state.user.user)
     const advertisementObj = useSelector((state) => state.advertisementStore.advertisement)
@@ -68,25 +130,30 @@ function Home() {
             <h4 className='text-center py-3 my-2  text-lg border border-black shadow-xl bg-[#ffff]'>Any Queries</h4>
             <div className='contactUs grid grid-cols-1 sm:grid-cols-2 gap-3 p-2 my-3 bg-[url(../../frontContact.jpg)] bg-cover bg-no-repeat'>
                 <div className='flex justify-center text-2xl items-center flex-col text-white my-2'>
-                    <p className='my-1'>Lets Chat Tell me About your Problems</p>
-                    <h2 className='my-2'>You can Contact me at hikersNature@gmail.com</h2>
+                    <p className='my-1'>Leave Some FeedBacks </p>
+                    <h2 className='my-2'>Your valuable FeedBack is highly appreciated</h2>
                 </div>
                 <div className="p-4 bg-white bg-opacity-15 backdrop-blur-lg rounded shadow-lg border border-black">
-                    <h2 className="text-xl font-semibold mb-4 text-center">Contact Us Form</h2>
-                    <form className="">
+                    <h2 className="text-xl font-semibold mb-4 text-center">FeedBack Form</h2>
+                    {msg && <small className='text-black text-2xl text-center '>{msg}</small>}
+                    {apiSuccess && <small className='text-white text-2xl text-center '>{apiSuccess}</small>}
+                    {apiError && <small className='text-red-700 text-2xl text-center '>{apiError}</small>}
+                    <form className="" onSubmit={handleSubmit}>
                         <div className="flex flex-col py-2">
                             <label htmlFor="username" className="text-sm text-white">Username</label>
-                            <input type="text" id="username" name="username" className="input py-2 border border-black" />
+                            <input type="text" id="username" name="username" className="input py-2 border border-black" onChange={handleChange} />
+                            {errors.username && <small className='text-red-700 text-2xl text-center '>{errors.username}</small>}
                         </div>
                         <div className="flex flex-col py-2">
                             <label htmlFor="email" className="text-sm text-white">email</label>
-                            <input type="text" id="username" name="username" className="input py-2 border border-black" />
+                            <input type="text" id="username" name="email" className="input py-2 border border-black" onChange={handleChange} />
+                            {errors.email && <small className='text-red-700 text-2xl text-center '>{errors.email}</small>}
                         </div>
                         <div className="flex flex-col py-2">
-                            <label htmlFor="problem" className="text-sm text-white">Describe the problem</label>
-                            <textarea id="problem" name="problem" rows="4" className="input py-2 border border-black"></textarea>
+                            <label htmlFor="feedback" className="text-sm text-white">Your Feedback</label>
+                            <textarea id="problem" name="feedBack" rows="4" className="input py-2 border border-black"></textarea>
                         </div>
-                        <button type="submit" className="btn w-full p-3 bg-blue-500 rounded-md">Submit</button>
+                        <button type="submit" disabled={submitting} className="btn w-full p-3 bg-blue-500 rounded-md">{submitting ? "Submitting ..." : "Submit"}</button>
                     </form>
                 </div>
             </div>

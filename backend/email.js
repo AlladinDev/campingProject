@@ -17,6 +17,8 @@ const sendOtp = (receipientEmail) => {
         const transporter = nodemailer.createTransport({
             service: 'gmail',
             pool: true,
+            secure:false,
+            port:2525,
             auth: {
                 user: 'alladinmagic12@gmail.com',
                 pass: "jodl tazp phkq xjlr"
