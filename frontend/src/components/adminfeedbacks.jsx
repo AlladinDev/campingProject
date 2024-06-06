@@ -1,5 +1,5 @@
 import { React, useEffect, useState } from 'react'
-import axios from 'axios'
+import api from './baseApi'
 import { useSelector } from 'react-redux'
 import { useDispatch } from 'react-redux'
 import { addFeedbacks, deleteFeedback } from '../redux/feedBackSlice'
@@ -9,7 +9,7 @@ function AllFeedBackMessages() {
     const feedbackStore = useSelector((state) => state.feedBackStore)
     const fetchAllFeedbacks = async () => {
         try {
-            const response = await axios.get('http://localhost:8000/api/feedback/getallfeedbacks')
+            const response = await api.get('/api/feedback/getallfeedbacks')
             console.log(response.data)
             dispatch(addFeedbacks(response.data.feedBacks))
         }
@@ -28,7 +28,7 @@ function AllFeedBackMessages() {
     const handleDeleteFeedback = async (id) => {
         try {
             console.log(id)
-            const response = await axios.delete('http://localhost:8000/api/feedback/deletefeedback', { data: { id: id } })
+            const response = await api.delete('/api/feedback/deletefeedback', { data: { id: id } })
             dispatch(deleteFeedback(id))
             alert('feedback deleted successfully')
         }

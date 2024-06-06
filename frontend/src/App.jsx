@@ -25,7 +25,6 @@ const GuidePage = lazy(() => import('./components/guidePage'));
 const Protected = lazy(() => import('./components/protected'));
 const Feedback = lazy(() => import('./components/feedback'));
 const AddTrip = lazy(() => import('./components/addTrip'));
-const AddMember = lazy(() => import('./components/addMember'));
 const AllUsers = lazy(() => import('./components/allUsers'));
 const AllMembers = lazy(() => import('./components/allMembers'));
 const PaymentSuccess = lazy(() => import('./components/paymentSuccess'));
@@ -36,12 +35,13 @@ const AddToGallery = lazy(() => import('./components/addtogallery'));
 const AboutUs = lazy(() => import('./components/aboutus'));
 const AllFeedBackMessages = lazy(() => import('./components/adminfeedbacks'))
 const OtpProtected = lazy(() => import('./components/otpProtected'))
+import api from './components/baseApi';
 function App() {
 
   const dispatch = useDispatch();
   const fetchTreks = async () => {
     try {
-      const response = await axios.get('http://localhost:8000/api/trips/getalltrips')
+      const response = await api.get('/api/trips/getalltrips')
       dispatch(addTrip(response.data.trips))
     }
     catch (err) {
@@ -50,7 +50,7 @@ function App() {
   }
   const fetchAdvertisement = async () => {
     try {
-      const response = await axios.get("http://localhost:8000/api/advertisement/getadvertisement")
+      const response = await api.get("/api/advertisement/getadvertisement")
       dispatch(addAdvertisement(response.data.advertisement))
     }
     catch (err) {
@@ -62,7 +62,7 @@ function App() {
     fetchTreks()
     generateFingerprint().then(async (id) => {
       dispatch(addDeviceID(id));
-      const response = await axios.post('http://localhost:8000/api/checkAuthStatus', { userID: id }, {
+      const response = await api.post('/api/checkAuthStatus', { userID: id }, {
         withCredentials: true
       });
       if (response.request.status === 200) {
@@ -100,7 +100,7 @@ function App() {
               <Route exact path='/adminpage/guideRegister' element={<GuideRegister />} />
               <Route exact path='/adminpage/addfeedback' element={<Feedback />} />
               <Route exact path='/adminpage/advertisement' element={<Advertisement />} />
-              <Route exact path='/adminpage/addmember' element={<AddMember />} />
+             
               <Route exact path='/adminpage/allUsers' element={<AllUsers />} />
               <Route exact path='/adminpage/allmembers' element={<AllMembers />} />
               <Route exact path='/adminpage/feedbacks' element={<AllFeedBackMessages />} />

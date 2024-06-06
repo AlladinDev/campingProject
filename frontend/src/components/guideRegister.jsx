@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import axios from 'axios';
 import validator from './customformvalidator';
 import { useNavigate } from 'react-router-dom';
 import {useDispatch} from 'react-redux'
 import { addAnotherMember } from '../redux/teamMemberSlice';
+import api from './baseApi';
 const Form = () => {
   const navigate = useNavigate()
   const dispatch=useDispatch()
@@ -67,7 +67,7 @@ const Form = () => {
     setSubmitting(true)
     try {
       setSubmittingMsg('submitting form data')
-      const result = await axios.post('http://localhost:8000/api/guide/register', data, {
+      const result = await api.post('/api/guide/register', data, {
         headers: {
           'Content-Type': "multipart/form-data"
         }

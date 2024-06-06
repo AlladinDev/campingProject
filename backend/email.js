@@ -64,7 +64,7 @@ const verifyOtp = (receivedOtp) => {
         if (generatedOtp != receivedOtp) {
             console.log('otp received for verification is',generatedOtp)
             console.log(generatedOtp != receivedOtp)
-            const errObj = new Error('invalid otp')
+            const errObj = new Error('Invalid Otp')
             errObj.status = 400
             reject(errObj)//if invalid otp sent
         }

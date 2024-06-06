@@ -6,7 +6,7 @@ const UserPage = () => {
   const user=useSelector((state)=>state.user.user)
   console.log(user)
   return (
-    <div className="p-12">
+    <div >
       <Profilepage data={user} heading='Trips Joined'/>
     </div>
   );

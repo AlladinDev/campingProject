@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
 import { useEffect } from 'react';
 import { useSelector } from 'react-redux'
 import validator from './customformvalidator'
+import api from './baseApi';
 const Form = () => {
     const navigate = useNavigate()
     const id = useSelector((state) => state.user.deviceID)
@@ -54,17 +54,16 @@ const Form = () => {
             setErrors(errors)
             return
         }
-        setSubmitting(true)    
+        setSubmitting(true)
         setSubmittingMsg('submitting form data plz wait')
         console.log('all validations passed printing from data')
         console.log('final data ready to be registered from register page is', formData)
         try {
-            const dataReceived = await axios.post('http://localhost:8000/api/user/register', formData, {
+            const dataReceived = await api.post('/api/user/register', formData, {
                 headers: {
-                    'Content-Type': 'multipart/form-data',
-                    'deviceId': fingerprint//send device unique id,
-
-                }, withCredentials: true
+                    'deviceId': fingerprint,//send device unique id,
+                    'Content-Type': "multipart/form-data"
+                }
             })
             setSubmitting(false)
             setSubmittingMsg('')
@@ -191,10 +190,10 @@ const Form = () => {
 
                 </div>
 
-                <button type="submit" disabled={isSubmitting} className="bg-blue-500 text-white px-4 py-2 rounded w-[100%] block mx-auto hover:bg-blue-600">
+                <button type="submit" disabled={isSubmitting} className="bg-blue-500 text-white btn rounded w-full block mx-auto hover:bg-blue-600">
                     {isSubmitting ? 'Submitting' : "Submit"}
                 </button>
-                <button className="bg-green-600 my-2  text-white px-4 py-2 rounded w-[100%] block mx-auto " onClick={() => navigate('/userlogin')}>
+                <button className="bg-green-600 my-2  text-white btn rounded w-full hover:bg-green-600 mx-auto " onClick={() => navigate('/userlogin')}>
                     Already have an account..
                 </button>
             </form>

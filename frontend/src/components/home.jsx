@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import LazyLoad from 'react-lazyload'; // Import LazyLoad
 import { useSelector } from 'react-redux';
 import axios from 'axios'
+import api from './baseApi';
 function Home() {
     const navigate = useNavigate();
     const [errors, setErrors] = useState({})
@@ -55,7 +56,7 @@ function Home() {
             setSubmitting(true)
             setMsg("Submitting Feedback...")
            console.log('finalerrors are',errors)
-            const response = await axios.post('http://localhost:8000/api/feedback/addfeedback', validData)
+            const response = await api.post('/api/feedback/addfeedback', validData)
             setSubmitting(false)
             setMsg('')
             setApiSuccess("Feedback Submitted")

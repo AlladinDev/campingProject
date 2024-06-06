@@ -3,7 +3,7 @@ import { useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faMapMarkerAlt, faCalendarAlt, faUser, faEnvelope, faPhone, faVenusMars } from '@fortawesome/free-solid-svg-icons';
-import axios from 'axios';
+import api from './baseApi';
 export default function PaymentSuccess() {
   const { tripId } = useParams();
   const tripData = useSelector(state => state.tripStore.tripData);
@@ -14,7 +14,7 @@ export default function PaymentSuccess() {
       console.log('useremail is', user)
       if (!user || !Object.keys(user).length)
         return
-      const response = await axios.post('http://localhost:8000/api/user/addtrip', { email: user.email, tripId: tripId })
+      const response = await api.post('/api/user/addtrip', { email: user.email, tripId: tripId })
       console.log(response)
     }
     catch (err) {

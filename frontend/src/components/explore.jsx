@@ -2,10 +2,10 @@ import React from 'react'
 import { useSelector } from 'react-redux'
 import { useDispatch } from 'react-redux'
 import { useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
-import axios from 'axios'
+import api from './baseApi'
 import { loadStripe } from '@stripe/stripe-js'
 import { addTrip } from '../redux/tripsSlice'
+import { useNavigate } from 'react-router-dom'
 function Explore() {
   const dispatch = useDispatch()
   const navigate = useNavigate()
@@ -14,7 +14,7 @@ function Explore() {
   const email = useSelector((state) => state.user.user.email)
   console.log('auth status from explore page is', authStatus)
   const fetchData = async () => {
-    const response = await axios.get('http://localhost:8000/api/trips/getalltrips')
+    const response = await api.get('/api/trips/getalltrips')
     console.log(response)
     dispatch(addTrip(response.data.trips))
     setTrips(response.data.trips)
@@ -24,10 +24,10 @@ function Explore() {
   }, [])
   const payment = async (price, tripId) => {
     try {
-      const userResponse = await axios.post('http://localhost:8000/api/user/addtrip', { email, tripId })
+      const userResponse = await api.post('/api/user/addtrip', { email, tripId })
       console.log('result from add trip for user', userResponse.status)
-      const stripe = await loadStripe('pk_test_51P928jSG2H8tvxJlySEKWcC4kJt5ERdwMBNmSfFQHKj10FbuT4whK2Q3SXAkGAWZeTOZPY6L70Lf95wRzH81SBB400TC0njwbE');
-      const response = await axios.post('http://localhost:8000/api/trips/checkoutTrip', { amount: price });
+      const stripe = await loadStripe(process.env.REACT_APP_striyPublishableKey);
+      const response = await api.post('/api/trips/checkoutTrip', { amount: price });
       const session = response.data.session;
       console.log('response is checout', response)
       const result = stripe.redirectToCheckout({
@@ -55,17 +55,23 @@ function Explore() {
                 {trip.destination}
               </h2>
               <h1 className="text-lg my-1 text-black">
+                Trip Type: {trip.tripType}
+              </h1>
+              <h1 className="text-lg my-1 text-black">
+                Difficulty: {trip.difficulty}
+              </h1>
+              <h1 className="text-lg my-1 text-black">
                 Date: {trip.date}
               </h1>
               <h1>Trip Id : {trip._id}</h1>
               <hr />
               <h1 className='my-1'>Duration :{trip.tripDuration} Days</h1>
-              <h1>Difficulty:Moderate</h1>
+              <h1>{trip.duration}</h1>
               <hr />
 
             </div>
             <div className='w-full flex justify-center items-center  py-2 my-2'>
-              <button className='w-full py-2 rounded-full bg-blue-700 text-white text-2xl' onClick={() => navigate(`/tripinfo/${trip._id}`)}>Get Trip info</button>
+              <button className='w-full btn rounded-full bg-blue-700 text-white text-2xl' onClick={() => navigate(`/tripinfo/${trip._id}`)}>Get Trip info</button>
             </div>
           </div>
         )) : <div className='min-h-[90vh] w-full flex justify-center items-center'>

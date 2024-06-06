@@ -42,8 +42,10 @@ const verifyOtpFunction = async (req, res) => {
     return res.status(200).cookie('AuthCookie', data, { maxAge: 1814400000 }).json({ success: true, user: userExists, message: 'user authenticated' })
   }
   catch (err) {
-    console.log('err in verifyotp function in adminController', err)
-    return res.status(500).json({ message: "Server Error" })
+    err.message = err.message || "Server Error"
+    err.status = err.status || 500
+    console.log('err in verifyotp function in admincontroller', err)
+    return res.status(err.status).json({ message: err.message })
 
   }
 }

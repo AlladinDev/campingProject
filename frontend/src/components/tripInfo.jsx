@@ -1,39 +1,39 @@
 import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router-dom';
-import axios from 'axios';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCampground, faPhone, faFire, faHiking, faMapMarkedAlt, faStar, faTree } from '@fortawesome/free-solid-svg-icons';
 import MapComponent from './leafletmap';
 import useweatherdata from './useweatherdata';
 import Weathercard from './weathercard';
 import { loadStripe } from '@stripe/stripe-js';
+import api from './baseApi';
 export default function TripInfo() {
     const { id: tripId } = useParams()
     console.log(tripId)
     const trip = useSelector((state) => state.tripStore.tripData);
-    const AuthStatus= useSelector((state) => state.user.authStatus);
-    console.log('tripstore is',trip)
+    const AuthStatus = useSelector((state) => state.user.authStatus);
+    console.log('tripstore is', trip)
     const [weatherErr, setWeatherErr] = useState('');
     const [joining, setJoining] = useState(false);
     const tripData = trip.filter((item) => item._id === tripId)[0];
     console.log('tridata is', tripData)
     const [weatherInfo, weatherApiErr] = useweatherdata(tripData ? tripData.destination : "Srinagar");
     console.log('hi ', weatherInfo)
-    const navigate=useNavigate()
+    const navigate = useNavigate()
 
-    const makePayment = async ({price,tripId}) => {
+    const makePayment = async ({ price, tripId }) => {
         try {
             console.log('price is', price)
             const stripe = await loadStripe('pk_test_51PMnMyA1e3ycfevIlPy43SbtxMWAZrQfAOadG1avwUqacj8GCwXrQwybdj9DBS7Euhx846kDqlud8SOhhGBqbP2k00y46sh9Sh');
             setJoining(true)
-            const session = await axios.post('http://localhost:8000/api/user/check-out-session', { tripPrice: price, tripId:tripId })
+            const session = await api.post('/api/user/check-out-session', { tripPrice: price, tripId: tripId })
             console.log('sesion is', session)
             // await stripe.redirectToCheckout({
             //     sessionId:  session.data.url // Use the session ID from the response
             // });
-            
-            window.location.href=session.data.url
+
+            window.location.href = session.data.url
         }
         catch (err) {
             setJoining(false)
@@ -60,6 +60,10 @@ export default function TripInfo() {
                                     <td className='text-2xl'>{tripData.destination}</td>
                                 </tr>
                                 <tr>
+                                    <td className='text-2xl font-semibold'>Trip Type:</td>
+                                    <td className='text-2xl'>{tripData.tripType}</td>
+                                </tr>
+                                <tr>
                                     <td className='font-semibold'>Duration:</td>
                                     <td>{tripData.tripDuration} days</td>
                                 </tr>
@@ -69,7 +73,7 @@ export default function TripInfo() {
                                 </tr>
                                 <tr>
                                     <td className='font-semibold'>Difficulty:</td>
-                                    <td>Moderate</td>
+                                    <td>{tripData.difficulty}</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -91,8 +95,8 @@ export default function TripInfo() {
                         <h2 className='p-2 py-2 my-2 rounded-md text-2xl bg-yellow-200'>
                             Contact Guide <a href={`tel:91${tripData.guideAllotted.mobile}`}><FontAwesomeIcon size='2x' icon={faPhone} className='ml-2 text-blue-600' /></a>
                         </h2>
-                        <button  disabled={joining} className='p-2 py-2 w-full bg-blue-600 rounded-md text-white cursor-pointer hover:bg-blue-700' onClick={AuthStatus?() => makePayment({price:tripData.price,tripId:tripData._id}):()=>navigate('/userlogin')}>
-                           {joining ? "Redirecting To PaymentForm":"Join Trip"}
+                        <button disabled={joining} className='btn w-full bg-blue-600 rounded-md text-white cursor-pointer hover:bg-blue-700' onClick={AuthStatus ? () => makePayment({ price: tripData.price, tripId: tripData._id }) : () => navigate('/userlogin')}>
+                            {joining ? "Redirecting To PaymentForm" : "Join Trip"}
                         </button>
                     </div>
                     <div className="bg-blue-200 w-full max-w-[480px] rounded-lg shadow-lg my-2 p-9">

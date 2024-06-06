@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { useDispatch,useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 import {  addUserType } from '../redux/userSlice'
-import axios from 'axios';
+import api from './baseApi';
 const LoginForm = () => {
   const dispatch = useDispatch()
 
@@ -48,7 +48,7 @@ const LoginForm = () => {
     // setApiSuccess('')//reset api success message if any
     try {
       setSubmitting(true)//set submit button status to true
-      const response = await axios.post(`http://localhost:8000/api/${data.userType}/login`, data)
+      const response = await api.post(`/api/${data.userType}/login`, data)
       dispatch(addUserType(data.userType))
       // dispatch(addUserName(response.data.username))
       navigate({ pathname: '/otpform'},{state: { userType: data.userType, email: data.email } })

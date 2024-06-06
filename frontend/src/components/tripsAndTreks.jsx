@@ -1,11 +1,11 @@
 import React from 'react'
-import {  useSelector } from 'react-redux'
+import { useSelector } from 'react-redux'
 function TripsAndTreks() {
     const trips = useSelector((state) => state.tripStore.tripData)
     return (
         <div className='flex justify-around gap-2 my-2 flex-wrap items-center'>
             {
-                trips.length!==0 ? trips.map((trip, keys) => (
+                trips.length !== 0 ? trips.map((trip, keys) => (
                     <div key={keys} className="w-full sm:max-w-[340px] bg-white shadow-lg border hover:bg-blue-300  hover:text-black transition duration-700 border-black rounded-lg overflow-hidden">
                         <img
                             className="w-full h-56 object-cover object-center"
@@ -13,9 +13,17 @@ function TripsAndTreks() {
                             alt="trip photo"
                         />
                         <div className="py-4 px-6">
-                            <h2 className="text-xl font-semibold text-gray-800 mb-2">
+                            <h2 className="text-xl text-center font-semibold text-gray-800 mb-2">
                                 {trip.destination}
                             </h2>
+                            <tr className=' text-gray-800 '>
+                                <td className='text-2xl font-semibold '>Trip Type:</td>
+                                <td className='text-2xl'>{trip.tripType}</td>
+                            </tr>
+                            <tr className='text-gray-800 '>
+                                <td className=' font-semibold'>Difficulty:</td>
+                                <td className=''>{trip.difficulty}</td>
+                            </tr>
                             <p className="text-lg text-gray-600">
                                 Date: {trip.date}
                             </p>

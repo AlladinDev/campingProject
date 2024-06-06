@@ -6,7 +6,8 @@ const { sendOtp, verifyOtp } = require('../email')
 const { bcryptverify } = require('../assets/hashing')
 const { hashpassword } = require('../assets/hashing')
 const jwtTokenGenerator = require('../assets/jwtTokenGenerator')
-const { get } = require('../routes/userRoutes')
+const { get } = require('../routes/userRoutes');
+const { error } = require('../assets/joischema');
 const getAllGuides = async (req, res) => {
   try {
     const users = await guidemodel.find({}, { __v: 0, password: 0, photoid: 0 })
@@ -113,8 +114,11 @@ const verifyOtpFunction = async (req, res) => {
     return res.status(200).cookie('AuthCookie', data, { maxAge: 1814400000 }).json({ success: true, message: 'user authenticated', user: necessaryData })
   }
   catch (err) {
+    console.log(err.message)
+    err.message = err.message || "Server Error"
+    err.status = err.status|| 500
     console.log('err in verifyotp function in guidecontroller', err)
-    return res.status(500).json({ message: "Server Error" })
+    return res.status(err.status).json({ message: err.message })
 
   }
 }

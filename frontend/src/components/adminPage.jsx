@@ -1,22 +1,23 @@
 // AdminPage.js
 import { React, useState } from 'react';
-import { Link, Outlet } from 'react-router-dom'
+import { Link, Outlet,useLocation } from 'react-router-dom'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useEffect } from 'react';
 import { faHome, faBars, faUsers,faArrowCircleLeft,faMountain, faImage, faCog, faMessage } from '@fortawesome/free-solid-svg-icons';
 import { useSelector, useDispatch } from 'react-redux';
-import axios from 'axios';
+import api from './baseApi';
 import { addUsers } from '../redux/allusersSlice';
 import { addMembers } from '../redux/teamMemberSlice';
 import { removeAdvertisement } from '../redux/advertisementSlice';
 const AdminPage = () => {
   const dispatch = useDispatch()
   const [isOpen, setIsOpen] = useState(false)
+  const location=useLocation()
   const advertisement = useSelector((state) => state.advertisementStore.advertisement)
   const advertisementPresent = useSelector((state) => state.advertisementStore.advertisementPresent)
   const fetchAllUsers = async () => {
     try {//api for getting all users
-      const response = await axios.get('http://localhost:8000/api/user/getallusers')
+      const response = await api.get('/api/user/getallusers')
       dispatch(addUsers(response.data.users))//add all users to redux allUsersSlice
     }
     catch (err) {
@@ -24,7 +25,7 @@ const AdminPage = () => {
     }
   }
   const fetchAllMembers = async () => {//get all team members and add them to guideslice in redux
-    const response = await axios.get('http://localhost:8000/api/guide/getallguides')
+    const response = await api.get('/api/guide/getallguides')
     console.log('guide response is', response)
     dispatch(addMembers(response.data.users))
   }
@@ -32,9 +33,20 @@ const AdminPage = () => {
     fetchAllUsers()
     fetchAllMembers()
   }, [])
+  window.addEventListener('resize', () => {
+    //this is because on smaller devices less than 670 px admin page has its own sidebard as navigation pannel
+    //so this navbar should hide at that time
+    const width = window.innerWidth
+    if (width <= '700') {
+     setIsOpen(true)
+    }
+    else if (width > '700') {
+      setIsOpen(false)
+    }
+  })
   const deleteAdvertisement = async () => {
     try {
-      const response = await axios.delete('http://localhost:8000/api/advertisement/deleteadvertisement', { data: { id: advertisement._id } })
+      const response = await api.delete('/api/advertisement/deleteadvertisement', { data: { id: advertisement._id } })
       console.log(response.data)
       alert('advertisement deleted successfully')
       dispatch(removeAdvertisement())
@@ -48,9 +60,9 @@ const AdminPage = () => {
   const user = useSelector((state) => state.user.user)
   return (
     <>
-      <div className="flex custom-scrollbar overflow-y-auto bg-no-repeat  bg-[url(../../adminpage.jpg)] bg-cover h-[100vh] min-[700px]:h-[92vh]">
+      <div className="flex custom-scrollbar  bg-no-repeat  bg-[url(../../adminpage.jpg)] bg-cover h-[92vh] min-[700px]:h-[92vh]">
         {/* Sidebar */}
-        <div className={`${isOpen ? 'hidden' : ' top-[8vh] absolute left-0 z-10'} overflow-hidden overflow-y-auto  h-[92vh] min-[700px]:block hidescrollbar bg-white bg-opacity-15 backdrop-blur-lg border border-black rounded shadow-lg `}>
+        <div className={`${isOpen ? 'hidden' : ' relative  '}  overflow-hidden overflow-y-auto  h-[92vh] min-[700px]:block hidescrollbar bg-white bg-opacity-15 backdrop-blur-lg border-black rounded shadow-lg `}>
           <div className="p-4">
             <h1 className="text-white text-2xl font-semibold mx-auto">Adventure Admin</h1>
           </div>
@@ -106,13 +118,13 @@ const AdminPage = () => {
           </nav>
         </div>
         {/* Main Content */}
-        <div className="flex-1 z-0  h-full   border-2 border-white overflow-auto   text-white bg-no-repeat  ">
+        <div className="flex-1 z-0  h-[92vh]   overflow-auto  text-white  ">
           <div className='rightNavbar  border border-black sticky top-0 z-10 text-2xl flex justify-evenly items-center bg-white bg-opacity-20 backdrop-blur-lg py-2 mb-4'>
             <h2 className=' ' onClick={() => setIsOpen(!isOpen)}> <FontAwesomeIcon icon={faBars} className="h-10 w-10 block min-[700px]:hidden " /></h2>
             <h2 className='hidden md:block '>Admin Dashboard</h2>
             <h2 className='relative '>Admin_Name: {user.username}</h2>
           </div>
-          <Outlet />
+          <Outlet  />
         </div>
       </div>
     </>

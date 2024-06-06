@@ -1,4 +1,4 @@
-import axios from 'axios';
+import api from './baseApi';
 import { React, useState, useEffect } from 'react'
 import { FaShieldAlt } from 'react-icons/fa';
 import { useLocation, useNavigate} from 'react-router-dom';
@@ -19,7 +19,7 @@ function EmailOtpVerification() {
     const verifyOtp = async (e) => {
         e.preventDefault()
         try {
-            const response = await axios.post(`http://localhost:8000/api/${userType}/verifyotp`, { email, userType,otp,deviceId}, { withCredentials: true })
+            const response = await api.post(`/api/${userType}/verifyotp`, { email, userType,otp,deviceId}, { withCredentials: true })
             console.log(response.data)
             setOtpSuccessMsg('User Autheticated')
             setOtp('')
@@ -46,9 +46,7 @@ function EmailOtpVerification() {
             setOtpErr('')
             setButtonClicked(true)
             setOtpMsg('Requesting Otp')
-            const response = await axios.post(`http://localhost:8000/api/${userType}/sendotp`,{email:email,userType:userType})
-            console.log(`http://localhost:8000/${userType}/sendotp`)
-            console.log(response.data)
+            const response = await api.post(`/api/${userType}/sendotp`,{email:email,userType:userType})
             setButtonClicked(false)
             setOtpMsg('')
             setOtpSent(true)

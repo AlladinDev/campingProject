@@ -1,6 +1,6 @@
 const mongoose = require('mongoose')
 const { v4: uid } = require('uuid');
-const guidedb=require('./guidemodel')
+const guidedb = require('./guidemodel')
 const schema = mongoose.Schema({
     destination: {
         type: String,
@@ -9,7 +9,7 @@ const schema = mongoose.Schema({
     tripDuration: {
         type: String,
         required: true,
-      
+
     },
     price: {
         type: String,
@@ -17,13 +17,13 @@ const schema = mongoose.Schema({
     },
 
     date: {
-        type:String,
+        type: String,
         required: true
 
     },
     guideAllotted: {
-        type:mongoose.Schema.Types.ObjectId,
-        ref:'guidedatabase'
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'guidedatabase'
     },
     photo: {
         type: String,
@@ -38,12 +38,19 @@ const schema = mongoose.Schema({
         type: String,
         required: true
     },
-
+    difficulty: {
+        type: String,
+        required: true
+    },
+    tripType: {
+        type: String,
+        required: true
+    },
     description: {
         type: String,
         required: true
     },
-    tripServices:{
+    tripServices: {
         type: String,
         required: true
     }

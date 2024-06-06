@@ -1,8 +1,8 @@
-import axios from 'axios';
+import api from './baseApi';
 import React, { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { useDispatch } from 'react-redux';
-import { addTrip } from '../redux/tripsSlice';
+import { addAnotherTrip } from '../redux/tripsSlice';
 const TripForm = () => {
   const dispatch = useDispatch()
   const availableGuides = useSelector((state) => state.allMembers.memberData)
@@ -21,6 +21,8 @@ const TripForm = () => {
     description: '',
     tripServices: '',
     tripDuration: '',
+    tripType:'',
+    difficulty:''
   });
   useEffect(() => {
     setGuides(availableGuides)
@@ -59,18 +61,17 @@ const TripForm = () => {
 
     try {
       console.log(tripData)
-      const response = await axios.post('http://localhost:8000/api/trips/addtrip', tripData, {
+      const response = await api.post('/api/trips/addtrip', tripData, {
         headers: {
           'Content-Type': "multipart/form-data"
         }
       })
       console.log(response)
       setApiSuccess("Trip Added Successfully")
-      dispatch(addTrip(response.data.trip))
+      dispatch(addAnotherTrip(response.data.trip))
       setSubmitting(false)
       // setApiSuccess('Trip Added Successfully')
-      // const tripsResponse = await axios.get('http://localhost:8000/api/trips/getalltrips')
-
+      // const tripsResponse = await api.get('http://localhost:8000/api/trips/getalltrips')
     }
     catch (err) {
       setApiError('oops something went wrong')
@@ -120,8 +121,23 @@ const TripForm = () => {
           <label htmlFor="whatIsIncluded" className="block text-white font-semibold mb-2">what's Included</label>
           <input type="text" id="tripIncludedServices" name="tripServices" value={tripData.tripServices} onChange={handleChange} className="input w-full border border-black py-2 px-4" />
         </div>
+        <div className="mb-4  ">
+         <select name="tripType" id="" className='rounded-lg px-4 py-3 w-full' value={tripData.tripType} onChange={handleChange}>
+          <option value="">Trip Type</option>
+          <option value="camping">Camping</option>
+          <option value="trekking">Trekking</option>
+         </select>
+        </div>
+        <div className="mb-4  ">
+         <select name="difficulty" id="" className='rounded-lg px-3 py-3 w-full' value={tripData.difficulty} onChange={handleChange}>
+          <option value="">Difficulty</option>
+          <option value="Easy">Easy</option>
+          <option value="Moderate">Moderate</option>
+          <option value="Tough">Tough</option>
+         </select>
+        </div>
         <div className="mb-4">
-          <select name="guideAllotted" id="" value={tripData.guideAllotted} onChange={handleChange} className="border appearance-none border-gray-400 rounded px-3 py-2 w-full">
+          <select name="guideAllotted" id="" value={tripData.guideAllotted} onChange={handleChange} className="border  border-gray-400 rounded-lg px-3 py-3 w-full">
             <option value=''>Guide List</option>
             {
               guides.map((item, keys) => (

@@ -1,16 +1,14 @@
 import React from 'react'
 export default function Profilepage({ data, heading = '' }) {
   console.log('data received is', data)
-
   return (
     <div>
-      <div className="bg-gray-100 p-6 min-h-screen">
+      <div className="bg-gray-100 w-full border-4 border-black p-6 min-h-screen">
         {/* data Profile Section */}
-        <div className="max-w-4xl mx-auto bg-white rounded-lg shadow-md p-6 mb-6">
+        <div className="w-full mx-auto  bg-white rounded-lg shadow-md p-3 mb-6">
           <h2 className='text-center font-bold text-2xl'>Hey ! Welcome Back <span className='text-blue-600 text-3xl'>{data.username}</span></h2>
           <div className="flex items-center mb-4">
             <img className="w-24 h-24 rounded-full mr-4 shadow-lg" src={data.photo} alt="data Profile Picture" />
-
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
@@ -47,6 +45,14 @@ export default function Profilepage({ data, heading = '' }) {
                       <tr>
                         <td className="py-2 pr-4 font-semibold text-gray-700">Destination:</td>
                         <td className="py-2 text-gray-700">{trip.destination}</td>
+                      </tr>
+                      <tr>
+                        <td className="py-2 pr-4 font-semibold text-gray-700">Trip Type:</td>
+                        <td className="py-2 text-gray-700">{trip.tripType}</td>
+                      </tr>
+                      <tr>
+                        <td className="py-2 pr-4 font-semibold text-gray-700">Difficulty:</td>
+                        <td className="py-2 text-gray-700">{trip.difficulty}</td>
                       </tr>
                       <tr>
                         <td className="py-2 pr-4 font-semibold text-gray-700">Date:</td>

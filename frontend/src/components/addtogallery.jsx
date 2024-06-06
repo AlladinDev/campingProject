@@ -1,4 +1,4 @@
-import axios from 'axios';
+import api from './baseApi';
 import React, { useState } from 'react';
 function AddToGallery() {
     const [apiErr, setApiErr] = useState('')
@@ -15,7 +15,7 @@ function AddToGallery() {
             
             setSubmitting(true)
             
-            const result = await axios.post('http://localhost:8000/api/gallery/addphoto', { photo: e.target[0].files[0] }, {
+            const result = await api.post('/api/gallery/addphoto', { photo: e.target[0].files[0] }, {
                 headers: {
                     'Content-Type': "multipart/form-data"
                 }

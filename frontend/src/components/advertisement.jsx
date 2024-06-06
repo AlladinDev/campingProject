@@ -1,6 +1,6 @@
 import React from 'react'
 import { useState } from 'react'
-import axios from 'axios'
+import api from './baseApi'
 import { useDispatch } from 'react-redux'
 import { addAdvertisement } from '../redux/advertisementSlice'
 export default function Advertisement() {
@@ -23,7 +23,7 @@ export default function Advertisement() {
             console.log(formData)
             setMsg("Adding Advertisement")
             setSubmitting(true)
-            const response = await axios.post('http://localhost:8000/api/advertisement/addadvertisement', { advertisement: formData.advertisement })
+            const response = await api.post('/api/advertisement/addadvertisement', { advertisement: formData.advertisement })
             setSubmitting(false)
             dispatch(addAdvertisement(response.data.advertisement))
             setMsg('')
