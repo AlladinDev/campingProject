@@ -1,6 +1,7 @@
 const usermodel = require("../model/usermodel");
 const guidemodel = require("../model/guidemodel");
 const adminmodel = require("../model/adminmodel");
+const checkMobile_EmailExistence= require("../assets/chechMobileOrEmailExists.js");
 const { sendOtp, verifyOtp } = require('../email.js')
 const { hashpassword, bcryptverify } = require('../assets/hashing')
 const cloudinary = require('cloudinary').v2
@@ -52,7 +53,7 @@ const verifyOtpFunction = async (req, res) => {
   }
   catch (err) {
     err.message = err.message || "Server Error"
-    err.status = err.status|| 500
+    err.status = err.status || 500
     console.log('err in verifyotp function in usercontroller', err)
     return res.status(err.status).json({ message: err.message })
 
@@ -87,16 +88,9 @@ const registercontroller = async (req, res) => {
   let user = null //variable to store user document created using usermode.create()
   try {
     //check if user is already registered
-    const [A, B, C, D, E, F] = await Promise.all(
-      [usermodel.findOne({ email: req.body.email }),
-      usermodel.findOne({ mobile: req.body.mobile }),
-      guidemodel.findOne({ mobile: req.body.mobile }),
-      guidemodel.findOne({ email: req.body.email }),
-      adminmodel.findOne({ mobile: req.body.mobile }),
-      adminmodel.findOne({ email: req.body.email })
-      ]
-    )
-    if (A || B || C || D || E || F)
+    const number_email_Exists=await checkMobile_EmailExistence(req.body.mobile,req.body.email)
+    console.log(number_email_Exists)
+    if (number_email_Exists)
       return res.status(403).json({ failure: true, message: "this email or mobile already exists" })
     uploadedphoto = await cloudinary.uploader.upload(req.body.photo)
     req.body.photo = uploadedphoto.secure_url;
@@ -165,10 +159,10 @@ const addTripController = async (req, res) => {
       return res.status(404).json({ message: "user not found" })
     const tripIdObject = new ObjectId(tripId)
     console.log('obj created is', tripIdObject)
-    const alreadyEnrolled = await usermodel.findOne({ tripId: tripIdObject })
+    const alreadyEnrolled = await usermodel.findOne({ trips: tripIdObject })
     if (alreadyEnrolled)
       return res.status(403).json({ message: 'Already Joined This trip' })
-    isPresent.tripId.push(tripId)
+    isPresent.trips.push(tripId)
     await isPresent.save()
     return res.status(200).json({ message: 'trip added for user successfully' })
   }

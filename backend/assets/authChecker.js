@@ -4,7 +4,6 @@ const guidemodel = require('../model/guidemodel')
 const adminmodel = require('../model/adminmodel')
 const checkAuthStatus = async (req, res) => {
   try {
-    console.log('cookies are', req.cookies)
     const id = req.body.userID
     const token = req.cookies.AuthCookie
     if (!token)
@@ -19,8 +18,6 @@ const checkAuthStatus = async (req, res) => {
         return res.status(403).json({ success: false, message: "token invalid" })
         
       }
-      console.log('decoded token values are ', value)
-      console.log('received id is', id)
       if (value.deviceId != id)
       {
         flag=true
@@ -38,10 +35,10 @@ const checkAuthStatus = async (req, res) => {
         user = await adminmodel.findOne({ email: jwtValue.email }, {  password: 0, __v: 0 })
         break;
       case "user":
-        user = await usermodel.findOne({ email: jwtValue.email }, {  password: 0, __v: 0 }).populate('tripId')
+        user = await usermodel.findOne({ email: jwtValue.email }, {  password: 0, __v: 0 }).populate('trips')
         break;
       case "guide":
-        user = await guidemodel.findOne({ email: jwtValue.email }, {  password: 0, __v: 0 }).populate('tripId')
+        user = await guidemodel.findOne({ email: jwtValue.email }, {  password: 0, __v: 0 }).populate('trips')
         break;
       default:
         user = null

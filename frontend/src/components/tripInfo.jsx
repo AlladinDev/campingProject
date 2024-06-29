@@ -132,7 +132,7 @@ export default function TripInfo() {
                         <Weathercard data={weatherInfo.current} />
                         <div className='min-h-[40vh] my-2 w-full flex flex-col justify-center items-center'>
                             <h3 className='text-2xl font-bold my-2'>Location Map</h3>
-                            <MapComponent markers={[{ lat: weatherInfo.location.lat, lng: weatherInfo.location.lon, popupText: "Destination Area" }]} />
+                            <MapComponent markers={{lat: weatherInfo.location.lat, lng: weatherInfo.location.lon, popupText: "Destination Area" }} />
                         </div>
                     </>}
                 {weatherApiErr && <div className='w-full min-h-[10vh]  flex justify-center items-center'><h2 className='text-3xl p-3  bg-white w-full max-w-[300px] text-center  flex justify-center items-center  shadow-lg aspect-video  my-2 border border-black'>No Weather And Map Available For this Area</h2> </div>}

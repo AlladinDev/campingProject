@@ -1,6 +1,7 @@
 const adminmodel = require("../model/adminmodel");
 const guidemodel = require('../model/guidemodel')
 const usermodel = require("../model/usermodel");
+const checkMobile_EmailExistence= require("../assets/chechMobileOrEmailExists.js");
 const { sendOtp, verifyOtp } = require('../email.js')
 const jwtTokenGenerator = require('../assets/jwtTokenGenerator.js')
 const { hashpassword, bcryptverify } = require('../assets/hashing')
@@ -77,16 +78,8 @@ const registercontroller = async (req, res) => {
   let uploadedphoto = null
   let admin = null //variable to store admin document created using adminmode.create()
   try {
-    const [A, B, C, D, E, F] = await Promise.all(
-      [usermodel.findOne({ email: req.body.email }),
-      usermodel.findOne({ mobile: req.body.mobile }),
-      guidemodel.findOne({ mobile: req.body.mobile }),
-      guidemodel.findOne({ email: req.body.email }),
-      adminmodel.findOne({ mobile: req.body.mobile }),
-      adminmodel.findOne({ email: req.body.email })
-      ]
-    )
-    if (A || B || C || D || E || F)
+   const mobile_email_exists=await checkMobile_EmailExistence(req.body.mobile,req.body.email)
+    if (mobile_email_exists)
       return res.status(403).json({ failure: true, message: "this email or mobile already exists" })
     uploadedphoto = await cloudinary.uploader.upload(req.body.photo)
     req.body.photo = uploadedphoto.secure_url;

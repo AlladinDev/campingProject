@@ -41,7 +41,7 @@ const schema = mongoose.Schema({
         type: String,
         required: true
     },
-    tripId: [{
+    trips: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'tripdatabase',
         default: null

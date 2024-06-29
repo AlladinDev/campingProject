@@ -52,7 +52,7 @@ export default function Navbar() {
             </select>
           </div>
         </div>
-        <div className={`btmnav ${isOpen ? `h-[70vh]` : `h-[0vh]`} w-full overflow-hidden  absolute z-40 transition-all  bg-[#4A71E0] top-[8vh] left-0   duration-500 ease-in-out`}>
+        <div className={`btmnav ${isOpen ? `h-[78vh]` : `h-[0vh]`} w-full overflow-hidden  absolute z-40 transition-all  bg-[#4A71E0] top-[8vh] left-0   duration-500 ease-in-out`}>
           <ul className='w-full  p-3 flex flex-col text-2xl py-12 justify-between items-center'>
             <li className=' hover:bg-gray-400 p-3 px-6 rounded-full'>
               <Link to='/'>Home</Link>

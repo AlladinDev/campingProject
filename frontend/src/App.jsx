@@ -45,7 +45,7 @@ function App() {
       dispatch(addTrip(response.data.trips))
     }
     catch (err) {
-      console.log(err)
+      //console.log(err)
     }
   }
   const fetchAdvertisement = async () => {
@@ -54,7 +54,7 @@ function App() {
       dispatch(addAdvertisement(response.data.advertisement))
     }
     catch (err) {
-      console.log('err in fetchadvertisement function')
+     // console.log('err in fetchadvertisement function')
     }
   }
   useEffect(() => {

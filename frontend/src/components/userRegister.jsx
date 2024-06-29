@@ -1,63 +1,45 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useEffect } from 'react';
 import { useSelector } from 'react-redux'
 import validator from './customformvalidator'
 import api from './baseApi';
 const Form = () => {
     const navigate = useNavigate()
-    const id = useSelector((state) => state.user.deviceID)
-    const [fingerprint, setFingerPrint] = useState('')
-    const [formData, setFormData] = useState({
-        username: '',
-        age: '',
-        gender: '',
-        email: '',
-        password: '',
-        address: '',
-        photo: null,
-        mobile: '',
-        userType: 'user'
-    });
-
-    useEffect(() => {//useEffect for getting fingerprint from redux and storing locally in above useState
-        setFingerPrint(id)
-    }, [])
+    const fingerprint = useSelector((state) => state.user.deviceID)
     const [errors, setErrors] = useState({});
-    const [apiErr, setApiErr] = useState('')
-    const [apiSuccess, setApiSuccess] = useState('')
+    const [statusMessages, setStatusMessages] = useState({
+        apiErr: '',
+        apiSuccess: '',
+        submittingMsg: ''
+    });
+    const deleteStatusMessages = () => {
+        setStatusMessages({})
+    }
     const [isSubmitting, setSubmitting] = useState(false)
-    const [submittingMsg, setSubmittingMsg] = useState('')//submitting message
     const handleChange = (e) => {
         const { name, value } = e.target;
-        setApiErr('')//delete api error
-        setApiSuccess('')//delete api success messages
-        setSubmittingMsg('')//delete submission messages
-
+        deleteStatusMessages()
         errors[e.target.name] = ""
-        setFormData({
-            ...formData,
-            [name]: value,
-        });
     };
     const handleFileChange = (e) => {
         setErrors({ ...errors, photo: '' })
-        setFormData({
-            ...formData,
-            photo: e.target.files[0],
-        });
     };
     const handleSubmit = async (e) => {
         e.preventDefault();
+        deleteStatusMessages()
+        const formDataObj = new FormData(e.target)
+        const formData = {}
+        formDataObj.entries().forEach(([key, value]) => {
+            formData[key] = value
+        });
+        formData.userType='user'
         const { err, errors, data } = validator(formData)
         if (err) {
             setErrors(errors)
             return
         }
         setSubmitting(true)
-        setSubmittingMsg('submitting form data plz wait')
-        console.log('all validations passed printing from data')
-        console.log('final data ready to be registered from register page is', formData)
+        setStatusMessages(prevState => ({ ...prevState, submittingMsg: 'Submitting form data plz wait' }))
         try {
             const dataReceived = await api.post('/api/user/register', formData, {
                 headers: {
@@ -66,33 +48,35 @@ const Form = () => {
                 }
             })
             setSubmitting(false)
-            setSubmittingMsg('')
-            setApiSuccess('user Registered successfully')
+            deleteStatusMessages()
+            setStatusMessages((prevState => ({ ...prevState, apiSuccess: 'Form Submitted Successfully' })))
             console.log('data received is', dataReceived)
             setTimeout(() => navigate('/userlogin'), 2000)
         }
         catch (err) {
-            console.log('api error is', err)
-            setSubmitting(false)
-            setSubmittingMsg('')
-            setApiSuccess('')
-            setApiErr(err.response.data.message)
-            console.log(err.response.data.message)
+            console.log('api error is', err);
+            setSubmitting(false);
+            deleteStatusMessages();
+            if (err.response) {
+                setStatusMessages(prevState => ({ ...prevState, apiErr: err.response.data.message }));
+            } else if (err.request) {
+                setStatusMessages(prevState => ({ ...prevState, apiErr: 'Server Error' }));
+            } else {
+                setStatusMessages(prevState => ({ ...prevState, apiErr: 'Something Went Wrong' }));
+            }
         }
-
     }
     return (
         <div className=" formcontainer mx-auto bg-cover bg-center bg-[url('../../registerpics.jpg')] flex  justify-center items-center p-4 min-h-[92vh]">
             <form onSubmit={handleSubmit} className='rounded-md shadow-lg bg-white bg-opacity-15 backdrop-blur-lg border-2 border-gray p-5 mt-2 '>
                 <h4 className='text-center text-black font-serif font-semibold text-2xl my-1'>Registration Form</h4>
-                <div className='text-center bg-white rounded-full text-green-600 uppercase font-serif animate-pulse'>{apiSuccess}</div>
-                <div className='text-center text-white uppercase'>{apiErr}</div>
-                <div className='text-center text-black uppercase'>{submittingMsg}</div>
+                <div className='text-center bg-white rounded-full text-green-600 uppercase font-serif animate-pulse'>{statusMessages.apiSuccess}</div>
+                <div className='text-center text-white uppercase'>{statusMessages.apiErr}</div>
+                <div className='text-center text-black uppercase'>{statusMessages.submittingMsg}</div>
                 <div className="mb-4">
                     <input
                         type="text"
                         name="username"
-                        value={formData.username}
                         onChange={handleChange}
                         placeholder="Username"
                         className="border border-gray-400 rounded px-3 py-2 w-full"
@@ -104,7 +88,6 @@ const Form = () => {
                     <input
                         type="text"
                         name="age"
-                        value={formData.age}
                         onChange={handleChange}
                         placeholder="Age"
                         className="border border-gray-400 rounded px-3 py-2 w-full"
@@ -113,7 +96,7 @@ const Form = () => {
                 </div>
 
                 <div className="mb-4">
-                    <select name="gender" id="" value={formData.gender} onChange={handleChange} className="border appearance-none border-gray-400 rounded px-3 py-2 w-full">
+                    <select name="gender" id="" onChange={handleChange} className="border appearance-none border-gray-400 rounded px-3 py-2 w-full">
                         <option value=''>select gender</option>
                         <option value="male">male</option>
                         <option value="female">female</option>
@@ -126,7 +109,6 @@ const Form = () => {
                     <input
                         type="text"
                         name="email"
-                        value={formData.email}
                         onChange={handleChange}
                         placeholder="Email"
                         className="border border-gray-400 rounded px-3 py-2 w-full"
@@ -138,7 +120,6 @@ const Form = () => {
                     <input
                         type="password"
                         name="password"
-                        value={formData.password}
                         onChange={handleChange}
                         placeholder="Password"
                         className="border border-gray-400 rounded px-3 py-2 w-full"
@@ -149,7 +130,6 @@ const Form = () => {
                     <input
                         type="tel"
                         name="mobile"
-                        value={formData.mobile}
                         onChange={handleChange}
                         placeholder="enter a valid mobile number"
                         className="border border-gray-400 rounded px-3 py-2 w-full"
@@ -160,7 +140,6 @@ const Form = () => {
                     <input
                         type="text"
                         name="address"
-                        value={formData.address}
                         onChange={handleChange}
                         placeholder="Address"
                         className="border border-gray-400 rounded px-3 py-2 w-full"
@@ -181,13 +160,11 @@ const Form = () => {
                     <input hidden
                         type="text"
                         name="userType"
-                        value={formData.userType}
                         onChange={handleChange}
                         placeholder="userType"
                         className="border border-gray-400 rounded px-3 py-2 w-full"
                         readOnly={true}
                     />
-
                 </div>
 
                 <button type="submit" disabled={isSubmitting} className="bg-blue-500 text-white btn rounded w-full block mx-auto hover:bg-blue-600">
@@ -198,6 +175,7 @@ const Form = () => {
                 </button>
             </form>
         </div>
+
 
     );
 };

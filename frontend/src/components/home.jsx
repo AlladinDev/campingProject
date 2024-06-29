@@ -1,9 +1,8 @@
-import { React, useState } from 'react';
+import { React, useEffect, useState } from 'react';
 import imagesJson from './frontImages';
 import { useNavigate } from 'react-router-dom';
 import LazyLoad from 'react-lazyload'; // Import LazyLoad
 import { useSelector } from 'react-redux';
-import axios from 'axios'
 import api from './baseApi';
 function Home() {
     const navigate = useNavigate();
@@ -12,6 +11,18 @@ function Home() {
     const [apiError, setApiError] = useState('')
     const [apiSuccess, setApiSuccess] = useState('')
     const [submitting, setSubmitting] = useState(false)
+    const deleteOldTrips = async () => {
+        try {
+            const result = await api.get('/api/trips/deleteoldtrips')
+            console.log(result)
+        }
+        catch (err) {
+            console.log(err)
+        }
+    }
+    useEffect(() => {
+        deleteOldTrips()
+    }, [])
     const validateData = (formData) => {
         const errors = {}
         const emailRegex = /^[A-Za-z0-9._%+-]+@gmail\.com$/
@@ -30,12 +41,12 @@ function Home() {
             return { errFlag: true, errors: errors, formData: formData }
         }
 
-        return { errFlag: false, errors: errors,validData: formData }
+        return { errFlag: false, errors: errors, validData: formData }
     }
     const handleChange = (e) => {
         const { name, value } = e.target
-        console.log('enter',name,value)
-        setErrors({...errors,[name]:''})
+        console.log('enter', name, value)
+        setErrors({ ...errors, [name]: '' })
     }
     const handleSubmit = async (e) => {
         try {
@@ -48,14 +59,14 @@ function Home() {
             data.entries().forEach(([key, value]) => {
                 formData[key] = value
             })
-            const { errFlag, errors,validData } = validateData(formData)
+            const { errFlag, errors, validData } = validateData(formData)
             if (errFlag) {
                 setErrors(errors)
                 return
             }
             setSubmitting(true)
             setMsg("Submitting Feedback...")
-           console.log('finalerrors are',errors)
+            console.log('finalerrors are', errors)
             const response = await api.post('/api/feedback/addfeedback', validData)
             setSubmitting(false)
             setMsg('')
@@ -115,7 +126,7 @@ function Home() {
                     ))
                 }
             </div>
-            <div className="trackerReviews w-full my-2">
+            <div className=" w-full my-2">
                 <h3 className=' min-h-12 bg-blue-700 text-center flex items-center text-3xl justify-center w-[98%] mx-auto rounded-lg text-white'>Why Join Us</h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-4 my-2 px-2">
                     <div className="bg-[#ffff] border border-black p-4 rounded-md shadow-xl"><h4 className='text-2xl'>You’re guarded with our trek again philosophy</h4>

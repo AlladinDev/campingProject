@@ -1,8 +1,9 @@
 const guidemodel = require('../model/guidemodel')
 const usermodel = require("../model/usermodel");
 const adminmodel = require("../model/adminmodel");
+const checkMobile_EmailExistence= require("../assets/chechMobileOrEmailExists.js");
 const cloudinary = require('cloudinary').v2
-const { sendOtp, verifyOtp } = require('../email')
+const { sendOtp, verifyOtp } = require('../email')//otp functions for send verify otp
 const { bcryptverify } = require('../assets/hashing')
 const { hashpassword } = require('../assets/hashing')
 const jwtTokenGenerator = require('../assets/jwtTokenGenerator')
@@ -36,16 +37,8 @@ const guideRegistration = async (req, res) => {
   let GuideUploadedPhoto = null;
   let user = null //variable to store user document created using usermode.create()
   try {
-    const [A, B, C, D, E, F] = await Promise.all(
-      [usermodel.findOne({ email: req.body.email }),
-      usermodel.findOne({ mobile: req.body.mobile }),
-      guidemodel.findOne({ mobile: req.body.mobile }),
-      guidemodel.findOne({ email: req.body.email }),
-      adminmodel.findOne({ mobile: req.body.mobile }),
-      adminmodel.findOne({ email: req.body.email })
-      ]
-    )
-    if (A || B || C || D || E || F)
+    const mobile_email_exists=await checkMobile_EmailExistence(req.body.mobile,req.body.email)
+    if (mobile_email_exists)
       return res.status(403).json({ failure: true, message: "this email or mobile already exists" })
     guidephoto = req.body.photo;
     console.log('guide photo is', guidephoto)

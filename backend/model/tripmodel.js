@@ -53,17 +53,11 @@ const schema = mongoose.Schema({
     tripServices: {
         type: String,
         required: true
+    },
+    expiresAfter:{
+        type:Date,
+        required: true
     }
 
 })
 module.exports = mongoose.model('tripdatabase', schema)
-/* destination: '',
-    photos: "",
-    guideAllotted: '',
-    date: '',
-    pickupPlace: '',
-    price: '',
-    description: '',
-    tripServices: '',
-    trekDuration: '',
-    */

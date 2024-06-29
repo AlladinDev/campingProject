@@ -24,7 +24,7 @@ export default function Profilepage({ data, heading = '' }) {
               <p><strong>Gender</strong> {data.gender}</p>
             </div>
             <div>
-              <p><strong>Total Trips:</strong> {data.tripId?.length}</p>
+              <p><strong>Total Trips:</strong> {data.trips?.length}</p>
               <p><strong>Email:</strong> {data.email}</p>
 
             </div>
@@ -32,12 +32,12 @@ export default function Profilepage({ data, heading = '' }) {
         </div>
 
         {/* Trip Information Section */}
-        {data?.tripId?.length !== 0 ?
+        {data?.trips?.length !== 0 ?
 
           <div className="max-w-4xl mx-auto bg-white rounded-lg shadow-md p-6">
             <h3 className="text-xl font-bold text-gray-900 mb-4">{heading}</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {data.tripId.map((trip, index) => (
+              {data.trips.map((trip, index) => (
                 <div key={index} className="bg-gray-100 rounded-lg p-6 shadow-lg  hover:border hover:border-black">
                   <h4 className="text-lg font-bold mb-4 text-gray-800">{trip.name}</h4>
                   <table className="min-w-full">

@@ -10,7 +10,6 @@ const hashpassword = (pass) => {
                 }
 
                 else {
-                    console.log('password hashed successfully from hash function')
                     resolve(result)
                 }
 
