@@ -3,7 +3,7 @@ import { React, useState } from 'react';
 import { Link, Outlet, useLocation } from 'react-router-dom'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useEffect } from 'react';
-import { faHome, faBars, faUsers, faArrowCircleLeft, faMountain, faImage, faCog, faMessage } from '@fortawesome/free-solid-svg-icons';
+import { faHome, faBars, faUsers, faArrowCircleLeft, faMountain, faImage, faCog, faMessage, faDashboard } from '@fortawesome/free-solid-svg-icons';
 import { useSelector, useDispatch } from 'react-redux';
 import api from './baseApi';
 import { addUsers } from '../redux/allusersSlice';
@@ -58,18 +58,21 @@ const AdminPage = () => {
 
     }
   }
+  const toggleDashboard=()=>{
+    setIsOpen(false)
+    setShowDashboard(!showDashboard)
+  }
   const user = useSelector((state) => state.user.user)
   return (
     <>
       <div className="flex relative custom-scrollbar bg-no-repeat  bg-[url(../../adminpage.jpg)] bg-cover h-[92vh] min-[700px]:h-[92vh]">
         {/* Sidebar */}
-        <div className={`${isOpen && 'hidden'} ${showDashboard && 'block'} w-[280px] overflow-hidden overflow-y-auto  h-[92vh]  hidescrollbar bg-white bg-opacity-15 backdrop-blur-lg border-black rounded shadow-lg`}>
-          <div className={`absolute `}>
+        <div className={`${isOpen && 'hidden'} transition-all duration-700 overflow-hidden overflow-y-auto  h-[92vh]  hidescrollbar bg-white bg-opacity-15 backdrop-blur-lg  rounded shadow-lg`}>   
             <div className="p-4">
               <h1 className="text-white text-2xl font-semibold mx-auto">Adventure Admin</h1>
             </div>
             <div className=' flex justify-center items-center'>
-              <h2 className='' onClick={() => setIsOpen(!isOpen)}> <FontAwesomeIcon icon={faArrowCircleLeft} className="h-10 bg-white p-2 rounded-full w-10 block min-[700px]:hidden" /></h2>
+              <h2 className='' onClick={() =>toggleDashboard()}> <FontAwesomeIcon icon={faArrowCircleLeft} className="h-10 bg-white p-2 rounded-full w-10 block min-[700px]:hidden" /></h2>
             </div>
             <div className="p-4">
               <h1 className="text-white text-2xl font-semibold">
@@ -118,12 +121,11 @@ const AdminPage = () => {
                 Add To gallery
               </Link>
             </nav>
-          </div>
         </div>
         {/* Main Content */}
         <div className="flex-1 z-0 relative h-[92vh]  border-2 border-red-500 overflow-auto  text-white  ">
           <div className='rightNavbar  border border-black sticky top-0 z-10 text-2xl flex justify-evenly items-center bg-white bg-opacity-20 backdrop-blur-lg py-2 mb-4'>
-            <h2 className=' ' onClick={() => setShowDashboard(!showDashboard)}> <FontAwesomeIcon icon={faBars} className="h-10 w-10 block min-[700px]:hidden " /></h2>
+            <h2 className=' ' onClick={() => toggleDashboard()}> <FontAwesomeIcon icon={faBars} className="h-10 w-10 block min-[700px]:hidden " /></h2>
             <h2 className='hidden md:block '>Admin Dashboard</h2>
             <h2 className='relative '>Admin_Name: {user.username}</h2>
           </div>

@@ -11,6 +11,10 @@ const TripForm = () => {
   const [apiSuccess, setApiSuccess] = useState('')
   const [apiMsg, setApiMsg] = useState('')
   const [isSubmitting, setSubmitting] = useState(false)
+  const date=new Date()
+  const month=date.getMonth()<10?'0'+(date.getMonth()+1):(date.getMonth()+1)
+ const presentDate=date.getFullYear()+'-'+month+'-'+date.getDate()
+  console.log('presentDate is',presentDate)
   const [tripData, setTripData] = useState({
     destination: '',
     photo: "",
@@ -99,7 +103,7 @@ const TripForm = () => {
         </div>
         <div className="mb-4">
           <label htmlFor="date" className="block text-white font-semibold mb-2">Trip Date</label>
-          <input type="date" id="Date" name="date" value={tripData.date} onChange={handleChange} className="input w-full py-2 px-4 border border-black" />
+          <input type="date" min={presentDate} id="Date" name="date" value={tripData.date} onChange={handleChange} className="input w-full py-2 px-4 border border-black" />
         </div>
         <div className="mb-4">
           <label htmlFor="text" className="block text-white font-semibold mb-2">Trek Duration</label>

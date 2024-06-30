@@ -2,7 +2,7 @@ import React from 'react'
 import { useSelector } from 'react-redux'
 import { useState, useEffect } from 'react'
 function AllUsers() {
-  const users = useSelector((state) => state.allUsers.users)
+  const users = useSelector((state) => state.allUsers.userData)
   return (
     <div className='flex justify-around flex-wrap text-white'>
       {

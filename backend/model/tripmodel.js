@@ -54,9 +54,10 @@ const schema = mongoose.Schema({
         type: String,
         required: true
     },
-    expiresAfter:{
-        type:Date,
-        required: true
+    expiresAfter: {
+        type: Date,
+        required: true,
+        index: { expires: '2m' }
     }
 
 })

@@ -11,18 +11,6 @@ function Home() {
     const [apiError, setApiError] = useState('')
     const [apiSuccess, setApiSuccess] = useState('')
     const [submitting, setSubmitting] = useState(false)
-    const deleteOldTrips = async () => {
-        try {
-            const result = await api.get('/api/trips/deleteoldtrips')
-            console.log(result)
-        }
-        catch (err) {
-            console.log(err)
-        }
-    }
-    useEffect(() => {
-        deleteOldTrips()
-    }, [])
     const validateData = (formData) => {
         const errors = {}
         const emailRegex = /^[A-Za-z0-9._%+-]+@gmail\.com$/
