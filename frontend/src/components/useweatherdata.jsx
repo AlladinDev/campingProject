@@ -1,6 +1,7 @@
 import { React, useEffect, useState } from 'react'
 import axios from 'axios';
 function useweatherdata(location) {
+    console.log('prop is',location)
     const [weatherInfo, setWeatherInfo] = useState('');
     const [weatherErr, setWeatherErr] = useState('');
     useEffect(() => {

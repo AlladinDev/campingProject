@@ -96,7 +96,7 @@ const verifyOtpFunction = async (req, res) => {
     const { email, userType, otp, deviceId } = req.body
     if (!email || !userType || !deviceId)
       return res.status(400).json({ message: "InSufficient Data Provided" })
-    const userExists = await guidemodel.findOne({ email: email }).populate('tripId')
+    const userExists = await guidemodel.findOne({ email: email }).populate('trips')
     if (!userExists)
       return res.status(404).json({ message: "User Not Found" })
     await verifyOtp(req.body.otp)//if error or wrong otp control passes to catch block automatically

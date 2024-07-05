@@ -10,12 +10,16 @@ function Explore() {
   const dispatch = useDispatch()
   const navigate = useNavigate()
   const [trips, setTrips] = useState([])
+  const [nothingPlanned, setNothingPlanned] = useState(false)
   const authStatus = useSelector((state) => state.user.authStatus)
   const email = useSelector((state) => state.user.user.email)
   console.log('auth status from explore page is', authStatus)
   const fetchData = async () => {
     const response = await api.get('/api/trips/getalltrips')
     console.log(response)
+    if (!response.data.trips.length) {
+      return setNothingPlanned(true)
+    }
     dispatch(addTrip(response.data.trips))
     setTrips(response.data.trips)
   }
@@ -74,12 +78,17 @@ function Explore() {
               <button className='w-full btn rounded-full bg-blue-700 text-white text-2xl' onClick={() => navigate(`/tripinfo/${trip._id}`)}>Get Trip info</button>
             </div>
           </div>
-        )) : <div className='min-h-[90vh] w-full flex justify-center items-center'>
-          <h3 className='text-2xl text-center text-black p-9 shadow-lg rounded-md flex justify-center items-center  min-h-[12rem] hover:scale-105 transition-all duration-500 bg-white'>Sorry We haven't planned Any Trip yet</h3>
-        </div>
+        )) :
+          <div className='loading loading-spinner'>
+          </div>
       }
-
+      {
+       nothingPlanned && < div className='min-h-[90vh] w-full flex justify-center items-center'>
+          <h3 className='text-2xl text-center text-black p-9 shadow-lg rounded-md flex justify-center items-center  min-h-[12rem] hover:scale-105 transition-all duration-500 bg-white'>Sorry We haven't planned Any Trip yet</h3>
+        </div >
+      }
     </div>
+
   )
 }
 

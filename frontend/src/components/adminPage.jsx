@@ -11,7 +11,8 @@ import { addMembers } from '../redux/teamMemberSlice';
 import { removeAdvertisement } from '../redux/advertisementSlice';
 const AdminPage = () => {
   const dispatch = useDispatch()
-  const [isOpen, setIsOpen] = useState(false)
+  const [mobileScreen, setMobileScreenDetected] = useState(false)
+  const [showSidebar, setShowSideBar] = useState(false)
   const [showDashboard, setShowDashboard] = useState(false)
   const location = useLocation()
   const advertisement = useSelector((state) => state.advertisementStore.advertisement)
@@ -39,10 +40,12 @@ const AdminPage = () => {
     //so this navbar should hide at that time
     const width = window.innerWidth
     if (width <= '700') {
-      setIsOpen(true)
+      setMobileScreenDetected(true)//hide dashboard on mobile screens first
+      
     }
     else if (width > '700') {
-      setIsOpen(false)
+      setMobileScreenDetected(false)
+  
     }
   })
   const deleteAdvertisement = async () => {
@@ -51,23 +54,20 @@ const AdminPage = () => {
       console.log(response.data)
       alert('advertisement deleted successfully')
       dispatch(removeAdvertisement())
-
     }
     catch (err) {
       console.log(err)
-
     }
   }
   const toggleDashboard=()=>{
-    setIsOpen(false)
-    setShowDashboard(!showDashboard)
+    setShowSideBar(!showSidebar)
   }
   const user = useSelector((state) => state.user.user)
   return (
     <>
       <div className="flex relative custom-scrollbar bg-no-repeat  bg-[url(../../adminpage.jpg)] bg-cover h-[92vh] min-[700px]:h-[92vh]">
         {/* Sidebar */}
-        <div className={`${isOpen && 'hidden'} transition-all duration-700 overflow-hidden overflow-y-auto  h-[92vh]  hidescrollbar bg-white bg-opacity-15 backdrop-blur-lg  rounded shadow-lg`}>   
+        <div className={`${mobileScreen && 'w-[0px] absolute'} ${showSidebar && ' w-[290px] '} z-20 transition-all duration-300 overflow-hidden overflow-y-auto  h-[92vh]  hidescrollbar bg-white bg-opacity-15 backdrop-blur-lg  rounded shadow-lg`}>   
             <div className="p-4">
               <h1 className="text-white text-2xl font-semibold mx-auto">Adventure Admin</h1>
             </div>
@@ -123,7 +123,7 @@ const AdminPage = () => {
             </nav>
         </div>
         {/* Main Content */}
-        <div className="flex-1 z-0 relative h-[92vh]  border-2 border-red-500 overflow-auto  text-white  ">
+      <div className="flex-1 z-0 border-2   border-red-900 relative h-[92vh]   overflow-auto  text-white  ">
           <div className='rightNavbar  border border-black sticky top-0 z-10 text-2xl flex justify-evenly items-center bg-white bg-opacity-20 backdrop-blur-lg py-2 mb-4'>
             <h2 className=' ' onClick={() => toggleDashboard()}> <FontAwesomeIcon icon={faBars} className="h-10 w-10 block min-[700px]:hidden " /></h2>
             <h2 className='hidden md:block '>Admin Dashboard</h2>
@@ -133,7 +133,6 @@ const AdminPage = () => {
         </div>
       </div>
     </>
-
   );
 };
 

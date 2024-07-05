@@ -159,9 +159,13 @@ const addTripController = async (req, res) => {
       return res.status(404).json({ message: "user not found" })
     const tripIdObject = new ObjectId(tripId)
     console.log('obj created is', tripIdObject)
-    const alreadyEnrolled = await usermodel.findOne({ trips: tripIdObject })
+    const alreadyEnrolled =isPresent.trips.includes(tripIdObject)//returns true of false
     if (alreadyEnrolled)
+    {
+      console.log('user already enrolled forbidden')
       return res.status(403).json({ message: 'Already Joined This trip' })
+    }
+     
     isPresent.trips.push(tripId)
     await isPresent.save()
     return res.status(200).json({ message: 'trip added for user successfully' })
