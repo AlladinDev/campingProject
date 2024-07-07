@@ -1,14 +1,18 @@
 const photoModel = require('../model/galleryModel')
 const cloudinary = require('cloudinary').v2
-const addPhoto = async (req,res) => {
+const addPhoto = async (req, res) => {
     let result = ''
     let uploadedPhoto = ''
     try {
-      console.log(req.files)
+        console.log(req.files)
 
         if (!req.files.photo)
             return res.status(400).json({ message: 'Photo Required' })
-        uploadedPhoto = await cloudinary.uploader.upload(req.files.photo.tempFilePath)
+        uploadedPhoto = await cloudinary.uploader.upload(req.files.photo.tempFilePath, {
+            transformation: [
+                { width: 360, height: 250, crop: 'scale' } // Resize while maintaining aspect ratio
+            ]
+        })
         req.body.photo = uploadedPhoto.secure_url
         req.body.photoId = uploadedPhoto.public_id
         result = await photoModel.create(req.body)
@@ -28,9 +32,9 @@ const addPhoto = async (req,res) => {
         return res.status(500).json({ message: "Server Error" })
     }
 }
-const getPhotos = async (req,res) => {
+const getPhotos = async (req, res) => {
     try {
-        const result = await photoModel.find({},{_id:0,__v:0,photoId:0})
+        const result = await photoModel.find({}, { _id: 0, __v: 0, photoId: 0 })
         return res.status(200).json({ photos: result })
     }
     catch (err) {
