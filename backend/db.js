@@ -5,7 +5,10 @@ const guidedb = require('./model/guidemodel'); // Adjust the path to your guide 
 async function watchTripDeletions() {
     try {
         const uri = process.env.atlasConnectionString;
-        await mongoose.connect(uri);
+        await mongoose.connect(uri, {
+            serverSelectionTimeoutMS: 60000,
+            socketTimeoutMS: 45000,
+        });
         console.log('Database connected');
 
         const tripCollection = mongoose.connection.collection('tripdatabases'); // Adjust collection name if necessary
@@ -27,7 +30,7 @@ async function watchTripDeletions() {
 async function handleTripDeletion(tripId) {
     const session = await mongoose.startSession();
     session.startTransaction();
-    
+
     try {
         // Remove tripId from users collection
         await userdb.updateMany(

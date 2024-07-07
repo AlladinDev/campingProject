@@ -1,7 +1,7 @@
 const tripModel = require('../model/tripmodel')
 const cloudinary = require('cloudinary').v2
 const guideModel = require('../model/guidemodel')
-const {getExpiryDate}= require('../expiryDateCalculator')
+const { getExpiryDate } = require('../expiryDateCalculator')
 const mongoose = require('mongoose')
 const stripe = require('stripe')('sk_test_51P928jSG2H8tvxJlaSKdXrU3RzQSy7QWwHexYNYFbgSJp7E7NMGD97aj3rvgGryRMEwPTyWSdVJU7mNaKKKTONcK007bVTXuVL');
 const addTrip = async (req, res) => {
@@ -11,11 +11,14 @@ const addTrip = async (req, res) => {
       return res.status(400).json({ message: "Insufficient Data" })
     const photo = req.body.photo//it has been appended to it by trip validator function
     //otherwise photo is in req.files ,here photo means photo path
-    uploadedPhoto = await cloudinary.uploader.upload(photo)
+    uploadedPhoto = await cloudinary.uploader.upload(photo, {
+      transformation: [
+        { width: 360, height: 250, crop: 'scale' } // Resize while maintaining aspect ratio
+      ]})
     req.body.photo = uploadedPhoto.secure_url
     req.body.photoId = uploadedPhoto.public_id
     console.log(req.body.date)
-    req.body.expiresAfter =getExpiryDate(req.body.date,req.body.tripDuration)//add the expiry date of trip after which it should be deleted
+    req.body.expiresAfter = getExpiryDate(req.body.date, req.body.tripDuration)//add the expiry date of trip after which it should be deleted
     const guide = await guideModel.findById(req.body.guideAllotted)
     const place = await tripModel.create(req.body)
     guide.trips.push(place._id)
